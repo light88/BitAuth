@@ -25,6 +25,7 @@ public class Register implements CommandExecutor {
 	private String user = "";
 	private String pass = "";
 	private String url = "";
+	private String logintable = "";
 	
 	public Register(BitAuth instance) {
 		this.instance = instance;
@@ -32,6 +33,7 @@ public class Register implements CommandExecutor {
 		pass = instance.config.readString("DB_Pass");
 		url = "jdbc:mysql://" + instance.config.readString("DB_Host") + 
 			"/" + instance.config.readString("DB_Name");
+		logintable = instance.config.readString("DB_Table_login");
 	}
 
 	@Override
@@ -47,7 +49,7 @@ public class Register implements CommandExecutor {
 				// Check for pre-existing user by this name
 				Statement select = conn.createStatement();
 				ResultSet result = select.executeQuery(
-						"SELECT * FROM `bit_login`");
+						"SELECT * FROM `" + logintable + "`");
 				
 				boolean playerFound = false;
 				
@@ -77,7 +79,7 @@ public class Register implements CommandExecutor {
 					long playerIP = instance.ipToLong(iAddress.getHostAddress());
 
 					// Set up the query
-					String query = "INSERT INTO `bit_login` "
+					String query = "INSERT INTO `" + logintable + "` "
 							+ "(`username`, `salt`, `password`, `whitelist`, "
 							+ "`lastlogintime`, `ipaddress`, `enableipcheck`) VALUES (?,?,?,?,?,?,?)";
 					PreparedStatement statement = conn.prepareStatement(query);

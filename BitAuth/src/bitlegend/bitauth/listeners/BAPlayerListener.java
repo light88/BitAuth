@@ -22,6 +22,8 @@ public class BAPlayerListener implements Listener {
 	private String user = "";
 	private String pass = "";
 	private String url = "";
+	private String logintable = "";
+	private String wltable = "";
 	
 	public BAPlayerListener(BitAuth instance) {
 		this.instance = instance;
@@ -29,6 +31,8 @@ public class BAPlayerListener implements Listener {
 		pass = instance.config.readString("DB_Pass");
 		url = "jdbc:mysql://" + instance.config.readString("DB_Host") + 
 				"/" + instance.config.readString("DB_Name");
+		logintable = instance.config.readString("DB_Table_login");
+		wltable = instance.config.readString("DB_Table_whitelist");
 	}
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
@@ -38,7 +42,7 @@ public class BAPlayerListener implements Listener {
 			Connection conn = DriverManager.getConnection(url, user, pass);
 			Statement select = conn.createStatement();
 			ResultSet result = select.executeQuery(
-					"SELECT * FROM `bit_whitelist`");
+					"SELECT * FROM `" + wltable + "`");
 			while (result.next()) {
 				String user = result.getString(1);
 				boolean allowed = (result.getInt(2) == 1 ? true : false);
@@ -61,7 +65,7 @@ public class BAPlayerListener implements Listener {
 				Connection conn = DriverManager.getConnection(url, user, pass);
 				Statement select = conn.createStatement();
 				ResultSet result = select.executeQuery(
-						"SELECT * FROM `bit_login`");
+						"SELECT * FROM `" + logintable + "`");
 				if (result.next()) { // Results found
 					boolean playerFound = false;
 					do {

@@ -23,6 +23,7 @@ public class Whitelist implements CommandExecutor {
 	private String user = "";
 	private String pass = "";
 	private String url = "";
+	private String wltable = "";
 	
 	public Whitelist(BitAuth instance) {
 		this.instance = instance;
@@ -30,6 +31,7 @@ public class Whitelist implements CommandExecutor {
 		pass = instance.config.readString("DB_Pass");
 		url = "jdbc:mysql://" + instance.config.readString("DB_Host") + 
 			"/" + instance.config.readString("DB_Name");
+		wltable = instance.config.readString("DB_Table_whitelist");
 	}
 	
 	@Override
@@ -71,7 +73,7 @@ public class Whitelist implements CommandExecutor {
 						}
 						
 						if (playerFound == true) { // Update existing information
-							String query = "UPDATE `bit_whitelist` SET enabled='"
+							String query = "UPDATE `" + wltable + "` SET enabled='"
 									+ (addremove == true ? 1 : 0)
 									+ "' WHERE username='" + username + "'";
 							Statement update = conn.createStatement();
@@ -80,7 +82,7 @@ public class Whitelist implements CommandExecutor {
 							update.close();
 						}
 						if (playerFound == false) { // Insert new data
-							String query = "INSERT INTO `bit_whitelist` " +
+							String query = "INSERT INTO `" + wltable + "` " +
 									"(`username`, `enabled`) VALUES (?,?)";
 							PreparedStatement insert = conn.prepareCall(query);
 							

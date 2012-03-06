@@ -47,6 +47,8 @@ public class Config {
 		write("DB_Name", "database");
 		write("DB_Pass", "password");
 		write("DB_Host", "hostipaddress");
+		write("DB_Table_login", "logintable");
+		write("DB_Table_whitelist", "whitelisttable");
 		write("Debug_Mode", false); //Set this to false or even completely remove this line
 	}
 	

@@ -20,6 +20,7 @@ public class Logout implements CommandExecutor {
 	private String user = "";
 	private String pass = "";
 	private String url = "";
+	private String logintable = "";
 	
 	public Logout(BitAuth instance) {
 		this.instance = instance;
@@ -27,6 +28,7 @@ public class Logout implements CommandExecutor {
 		pass = instance.config.readString("DB_Pass");
 		url = "jdbc:mysql://" + instance.config.readString("DB_Host") + 
 			"/" + instance.config.readString("DB_Name");
+		logintable = instance.config.readString("DB_Table_login");
 	}
 
 	@Override
@@ -53,7 +55,7 @@ public class Logout implements CommandExecutor {
 			
 			try {
 				Connection conn = DriverManager.getConnection(url, user, pass);
-				String query = "UPDATE `bit_login` SET lastlogintime='1' WHERE username='"
+				String query = "UPDATE `" + logintable + "` SET lastlogintime='1' WHERE username='"
 						+ player.getDisplayName() + "'";
 				Statement update = conn.createStatement();
 				update.executeUpdate(query);
