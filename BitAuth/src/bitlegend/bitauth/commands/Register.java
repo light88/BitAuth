@@ -56,10 +56,10 @@ public class Register implements CommandExecutor {
 				if (result.next()) { // Results found
 					do {
 						String username = result.getString(1);
-						if (username.equals(player.getDisplayName())) { // Player data found
+						if (username.equals(player.getName())) { // Player data found
 							player.sendMessage(ChatColor.GREEN
 									+ "Error: user by the name of "
-									+ player.getDisplayName()
+									+ player.getName()
 									+ " already found");
 							playerFound = true;
 						}
@@ -89,7 +89,7 @@ public class Register implements CommandExecutor {
 					// 4 = white list T/F, 5 = last login time, 6 = player ip,
 					// 7 = enable ip checking, 8 = pwreset T/F, 9 = temp pw,
 					// 10 = temp salt
-					statement.setString(1, player.getDisplayName());
+					statement.setString(1, player.getName());
 					statement.setBytes(2, salt);
 					statement.setBytes(3, hash);
 					statement.setBoolean(4, true);
@@ -109,7 +109,7 @@ public class Register implements CommandExecutor {
 					// Remove player from unregistered list
 					int index = 0;
 					for (Player p : instance.unregistered) {
-						if (p.getDisplayName().equals(player.getDisplayName()))
+						if (p.getName().equals(player.getName()))
 							index = instance.unregistered.indexOf(p);
 					}
 					instance.unregistered.remove(index);

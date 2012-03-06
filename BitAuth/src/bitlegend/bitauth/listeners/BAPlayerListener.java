@@ -46,7 +46,7 @@ public class BAPlayerListener implements Listener {
 			while (result.next()) {
 				String user = result.getString(1);
 				boolean allowed = (result.getInt(2) == 1 ? true : false);
-				if (user.equals(event.getPlayer().getDisplayName())) // Player found
+				if (user.equals(event.getPlayer().getName())) // Player found
 					if (allowed == true)
 						whitelisted = true;
 			}
@@ -70,7 +70,7 @@ public class BAPlayerListener implements Listener {
 					boolean playerFound = false;
 					do {
 						String username = result.getString(1);
-						if (username.equals(player.getDisplayName())) { // Player
+						if (username.equals(player.getName())) { // Player
 																		// data
 																		// found
 							playerFound = true;
@@ -90,11 +90,11 @@ public class BAPlayerListener implements Listener {
 								boolean alreadyInList2 = false;
 								int index = 0;
 								for (Player p : instance.loggedIn) {
-									if (p.getDisplayName().equals(player.getDisplayName()))
+									if (p.getName().equals(player.getName()))
 										alreadyInList = true;
 								}
 								for (Player p : instance.requireLogin) {
-									if (p.getDisplayName().equals(player.getDisplayName())) {
+									if (p.getName().equals(player.getName())) {
 										alreadyInList2 = true;
 										index = instance.requireLogin.indexOf(p);
 									}
@@ -104,7 +104,7 @@ public class BAPlayerListener implements Listener {
 								if (alreadyInList2 == true)
 									instance.requireLogin.remove(index);
 								player.sendMessage(ChatColor.GREEN +
-										"Welcome back, " + player.getDisplayName());
+										"Welcome back, " + player.getName());
 							}
 						}
 					} while (result.next());
@@ -127,7 +127,7 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				p.sendMessage(new String[] { 
 						ChatColor.GREEN + "Oh no! It appears you haven't registered for our server.", 
 						ChatColor.GREEN + "Not to fret though, you can register by simply typing:",
@@ -136,16 +136,16 @@ public class BAPlayerListener implements Listener {
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				p.sendMessage(new String[] { 
 						ChatColor.GREEN + "Please log in by typing:",
 						ChatColor.GREEN + "/login <password>" });
 			}
 		}
 		for (Player p : instance.loggedIn) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				p.sendMessage(ChatColor.GREEN + 
-						"Welcome back, " + event.getPlayer().getDisplayName());
+						"Welcome back, " + event.getPlayer().getName());
 			}
 		}
 	}
@@ -153,12 +153,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -180,19 +180,19 @@ public class BAPlayerListener implements Listener {
 		
 		int i = 0, j = 0, k = 0;
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(player.getDisplayName())) {
+			if (p.getName().equals(player.getName())) {
 				index[i] = instance.unregistered.indexOf(p);
 				i++;
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(player.getDisplayName())) {
+			if (p.getName().equals(player.getName())) {
 				index2[j] = instance.requireLogin.indexOf(p);
 				j++;
 			}
 		}
 		for (Player p : instance.loggedIn) {
-			if (p.getDisplayName().equals(player.getDisplayName())) {
+			if (p.getName().equals(player.getName())) {
 				index3[k] = instance.loggedIn.indexOf(p);
 				k++;
 			}
@@ -222,12 +222,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -245,12 +245,12 @@ public class BAPlayerListener implements Listener {
 		
 		if (allow == false) {
 			for (Player p : instance.unregistered) {
-				if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+				if (p.getName().equals(event.getPlayer().getName())) {
 					event.setCancelled(true);
 				}
 			}
 			for (Player p : instance.requireLogin) {
-				if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+				if (p.getName().equals(event.getPlayer().getName())) {
 					event.setCancelled(true);
 				}
 			}
@@ -260,12 +260,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerChat(PlayerChatEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -274,12 +274,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerInteractEvent(PlayerInteractEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -288,12 +288,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -302,12 +302,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerExpChangeEvent(PlayerExpChangeEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setAmount(0);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setAmount(0);
 			}
 		}
@@ -316,12 +316,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -330,12 +330,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerToggleSprintEvent(PlayerToggleSprintEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
@@ -344,12 +344,12 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
 		for (Player p : instance.unregistered) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}
 		for (Player p : instance.requireLogin) {
-			if (p.getDisplayName().equals(event.getPlayer().getDisplayName())) {
+			if (p.getName().equals(event.getPlayer().getName())) {
 				event.setCancelled(true);
 			}
 		}

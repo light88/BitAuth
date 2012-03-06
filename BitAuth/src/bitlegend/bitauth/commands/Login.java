@@ -44,7 +44,7 @@ public class Login implements CommandExecutor {
 		try {
 			boolean isLoggedIn = false;
 			for (Player p : instance.loggedIn) {
-				if (p.getDisplayName().equals(player.getDisplayName()))
+				if (p.getName().equals(player.getName()))
 					isLoggedIn = true;
 			}
 			
@@ -54,7 +54,7 @@ public class Login implements CommandExecutor {
 				
 				Statement select = conn.createStatement();
 				ResultSet result = select.executeQuery(
-						"SELECT * FROM `" + logintable + "` WHERE username='" + player.getDisplayName() + "'");
+						"SELECT * FROM `" + logintable + "` WHERE username='" + player.getName() + "'");
 				if (result.next()) { // Results found
 					byte[] salt = result.getBytes(2);
 					byte[] hash = result.getBytes(3);
@@ -72,14 +72,14 @@ public class Login implements CommandExecutor {
 								instance.byteToString(hash))) { // Passwords match
 							player.sendMessage(ChatColor.GREEN
 									+ "Password correct, welcome back "
-									+ player.getDisplayName());
+									+ player.getName());
 							
 							// Get unix time stamp
 							long unixtime = System.currentTimeMillis() / 1000L;
 							
 							// Set up the query
 							String query = "UPDATE `" + logintable + "` SET lastlogintime='" +
-									unixtime + "' WHERE username='" + player.getDisplayName() + "'";
+									unixtime + "' WHERE username='" + player.getName() + "'";
 							PreparedStatement statement = conn.prepareStatement(query);
 							statement.executeUpdate();
 							statement.close();
@@ -90,7 +90,7 @@ public class Login implements CommandExecutor {
 							// Remove player from requireLogin list
 							int index = 0;
 							for (Player p : instance.requireLogin) {
-								if (p.getDisplayName().equals(player.getDisplayName()))
+								if (p.getName().equals(player.getName()))
 									index = instance.requireLogin.indexOf(p);
 							}
 							instance.requireLogin.remove(index);

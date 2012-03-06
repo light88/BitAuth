@@ -38,14 +38,14 @@ public class Unregister implements CommandExecutor {
 		try {
 			// Create connection
 			Connection conn = DriverManager.getConnection(url, user, pass);
-			String query = "DELETE FROM `" + logintable + "` WHERE username='" + player.getDisplayName() + "'";
+			String query = "DELETE FROM `" + logintable + "` WHERE username='" + player.getName() + "'";
 			Statement delete = conn.createStatement();
 			delete.executeUpdate(query);
 			
 			// Remove player from loggedIn list
 			int index = 0;
 			for (Player p : instance.loggedIn) {
-				if (p.getDisplayName().equals(player.getDisplayName()))
+				if (p.getName().equals(player.getName()))
 					index = instance.loggedIn.indexOf(p);
 			}
 			instance.loggedIn.remove(index);

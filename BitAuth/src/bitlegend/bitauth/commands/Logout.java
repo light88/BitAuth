@@ -40,7 +40,7 @@ public class Logout implements CommandExecutor {
 		int index = 0;
 		boolean playerFound = false;
 		for (Player p : instance.loggedIn) {
-			if (p.getDisplayName().equals(player.getDisplayName())) {
+			if (p.getName().equals(player.getName())) {
 				index = instance.loggedIn.indexOf(p);
 				playerFound = true;
 			}
@@ -56,7 +56,7 @@ public class Logout implements CommandExecutor {
 			try {
 				Connection conn = DriverManager.getConnection(url, user, pass);
 				String query = "UPDATE `" + logintable + "` SET lastlogintime='1' WHERE username='"
-						+ player.getDisplayName() + "'";
+						+ player.getName() + "'";
 				Statement update = conn.createStatement();
 				update.executeUpdate(query);
 				

@@ -58,7 +58,7 @@ public class Ipcheck implements CommandExecutor {
 					Connection conn = DriverManager.getConnection(url, user, pass);
 					String query = "UPDATE `" + logintable + "` SET enableipcheck='"
 							+ ipcheckFlagInt + "' WHERE username='"
-							+ player.getDisplayName() + "'";
+							+ player.getName() + "'";
 					Statement update = conn.createStatement();
 					update.executeUpdate(query);
 					
