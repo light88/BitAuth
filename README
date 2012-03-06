@@ -10,9 +10,9 @@ Supported database types: MySQL
 Database name: bit_minecraft
 	Table: bit_login
 		Columns: username (text), salt (blob), password [hash] (blob), 
-			whitelist (tinyint), lastlogintime (bigint), ipaddress (bigint),
-			enableipcheck (tinyint), pwreset (tinyint), 
-			temppwd (blob),	tmpsalt (blob)
+			whitelist (tinyint), lastlogintime (bigint), 
+			ipaddress (bigint), enableipcheck (tinyint), 
+			pwreset (tinyint), temppwd (blob), tmpsalt (blob)
 	Table: bit_whitelist
 		Columns: username (text), enabled (tinyint)
 
