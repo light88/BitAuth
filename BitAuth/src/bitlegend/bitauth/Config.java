@@ -43,6 +43,7 @@ public class Config {
 	private void addDefaults() {
 		System.out.println("Generating Config file...");
 		write(instance.enableOnStart, true);
+		write("Use_Whitelist", false);
 		write("DB_User", "username");
 		write("DB_Name", "database");
 		write("DB_Pass", "password");

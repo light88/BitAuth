@@ -56,8 +56,8 @@ public class BAPlayerListener implements Listener {
 		} catch (SQLException sq) {
 			sq.printStackTrace();
 		}
-		
-		if (whitelisted == false)
+
+		if (whitelisted == false && instance.config.readBoolean("Use_Whitelist") == true)
 			event.disallow(null, "You are not whitelisted.");
 		else {
 			try {
