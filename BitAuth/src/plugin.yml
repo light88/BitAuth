@@ -23,3 +23,11 @@ commands:
     unregister:
         description: Can be used to unregister your account or by an administrator to remove the account of another user
         usage: /unregister [username]
+permissions:
+    bitauth.*:
+        description: Gives access to all BitAuth features
+        children:
+            bitauth.whitelist: true
+    bitauth.whitelist:
+        description: Allows you to modify the whitelist
+        default: op

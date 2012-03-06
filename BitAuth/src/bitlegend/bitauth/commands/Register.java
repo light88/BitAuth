@@ -81,12 +81,14 @@ public class Register implements CommandExecutor {
 					// Set up the query
 					String query = "INSERT INTO `" + logintable + "` "
 							+ "(`username`, `salt`, `password`, `whitelist`, "
-							+ "`lastlogintime`, `ipaddress`, `enableipcheck`) VALUES (?,?,?,?,?,?,?)";
+							+ "`lastlogintime`, `ipaddress`, `enableipcheck`, "
+							+ "`pwreset`, `temppwd`, `tmpsalt`) VALUES (?,?,?,?,?,?,?,?,?,?)";
 					PreparedStatement statement = conn.prepareStatement(query);
 
 					// Set query values; 1 = user, 2 = salt, 3 = password hash,
 					// 4 = white list T/F, 5 = last login time, 6 = player ip,
-					// 7 = enable ip checking
+					// 7 = enable ip checking, 8 = pwreset T/F, 9 = temp pw,
+					// 10 = temp salt
 					statement.setString(1, player.getDisplayName());
 					statement.setBytes(2, salt);
 					statement.setBytes(3, hash);
@@ -94,6 +96,9 @@ public class Register implements CommandExecutor {
 					statement.setLong(5, unixtime);
 					statement.setLong(6, playerIP);
 					statement.setBoolean(7, false);
+					statement.setBoolean(8, false);
+					statement.setBytes(9, null);
+					statement.setBytes(10, null);
 
 					// Execute the query
 					statement.executeUpdate();

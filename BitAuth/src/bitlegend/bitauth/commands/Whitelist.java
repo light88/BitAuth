@@ -39,8 +39,8 @@ public class Whitelist implements CommandExecutor {
 		boolean r = false;
 		Player player = (Player)sender;
 		
-		// Need to add permission handling
-		if (player.getDisplayName().equals("dechiridas")) {
+		// Check whether the player has permission to do this or not
+		if (player.hasPermission("bitauth.whitelist")) {
 			try {
 				if (split.length == 2) {
 					if (split[0].equals("add") || split[0].equals("del")) {
@@ -100,14 +100,19 @@ public class Whitelist implements CommandExecutor {
 						// Report back to player
 						player.sendMessage(ChatColor.GREEN + split[1]
 								+ " has been "
-								+ ((addremove == true) ? "added" : "removed")
-								+ " from the whitelist");
+								+ ((addremove == true) ? "added to" : "removed from")
+								+ " the whitelist");
 						r = true;
 					}
 				}
 			} catch (SQLException se) {
 				se.printStackTrace();
 			}
+		}
+		else {
+			player.sendMessage(ChatColor.GREEN +
+					"You do not have access to this feature.");
+			r = true;
 		}
 		
 		return r;
