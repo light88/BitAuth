@@ -14,6 +14,9 @@ Login table:
 Whitelist table:
 	Columns: username (text), enabled (tinyint)
 
+Permission Nodes:
+	bitauth.whitelist
+
 Supported commands:
     register:
         description: Registers to the server
