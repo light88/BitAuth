@@ -43,7 +43,7 @@ public class Whitelist implements CommandExecutor {
 			Player player = (Player)sender;
 			
 			// Check whether the player has permission to do this or not
-			if (player.hasPermission("bitauth.whitelist")) {
+			if (player.hasPermission("bitauth.whitelist") || player.isOp()) {
 				try {
 					if (split.length == 2) {
 						if (split[0].equals("add") || split[0].equals("del")) {
