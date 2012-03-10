@@ -79,4 +79,8 @@ public class BitAuth extends JavaPlugin {
 		}
 		return ip;
 	}
+	
+	public void logInfo(String info) {
+		System.out.println("[INFO] " + info);
+	}
 }

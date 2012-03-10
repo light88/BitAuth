@@ -34,47 +34,53 @@ public class Logout implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
 		boolean r = true; // You can't really fail to type this command properly
-		Player player = (Player)sender;
-
-		// Find the player in the loggedIn list
-		int index = 0;
-		boolean playerFound = false;
-		for (Player p : instance.loggedIn) {
-			if (p.getName().equals(player.getName())) {
-				index = instance.loggedIn.indexOf(p);
-				playerFound = true;
-			}
-		}
 		
-		if (playerFound == true) {
-			// Remove the player from the loggedIn list
-			instance.loggedIn.remove(index);
+		if (sender instanceof Player) {
+			Player player = (Player)sender;
+	
+			// Find the player in the loggedIn list
+			int index = 0;
+			boolean playerFound = false;
+			for (Player p : instance.loggedIn) {
+				if (p.getName().equals(player.getName())) {
+					index = instance.loggedIn.indexOf(p);
+					playerFound = true;
+				}
+			}
 			
-			// Add the player to the requireLogin list
-			instance.requireLogin.add(player);
-			
-			try {
-				Connection conn = DriverManager.getConnection(url, user, pass);
-				String query = "UPDATE `" + logintable + "` SET lastlogintime='1' WHERE username='"
-						+ player.getName() + "'";
-				Statement update = conn.createStatement();
-				update.executeUpdate(query);
+			if (playerFound == true) {
+				// Remove the player from the loggedIn list
+				instance.loggedIn.remove(index);
 				
-				update.close();
-				conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				// Add the player to the requireLogin list
+				instance.requireLogin.add(player);
+				
+				try {
+					Connection conn = DriverManager.getConnection(url, user, pass);
+					String query = "UPDATE `" + logintable + "` SET lastlogintime='1' WHERE username='"
+							+ player.getName() + "'";
+					Statement update = conn.createStatement();
+					update.executeUpdate(query);
+					
+					update.close();
+					conn.close();
+				} catch (SQLException se) {
+					se.printStackTrace();
+				}
 			}
+			
+			else {
+				player.sendMessage(ChatColor.GREEN
+						+ "It appears that you are not logged in to begin with!");
+			}
+			
+			if (playerFound == true)
+				player.sendMessage(ChatColor.GREEN + "Successfully logged out");
 		}
-		
 		else {
-			player.sendMessage(ChatColor.GREEN
-					+ "It appears that you are not logged in to begin with!");
+			instance.logInfo("This is an in-game only command.");
+			r = true;
 		}
-		
-		if (playerFound == true)
-			player.sendMessage(ChatColor.GREEN + "Successfully logged out");
-
 		return r;
 	}
 

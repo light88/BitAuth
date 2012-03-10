@@ -33,34 +33,40 @@ public class Unregister implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
 		boolean r = false;
-		Player player = (Player)sender;
 		
-		try {
-			// Create connection
-			Connection conn = DriverManager.getConnection(url, user, pass);
-			String query = "DELETE FROM `" + logintable + "` WHERE username='" + player.getName() + "'";
-			Statement delete = conn.createStatement();
-			delete.executeUpdate(query);
+		if (sender instanceof Player) {
+			Player player = (Player)sender;
 			
-			// Remove player from loggedIn list
-			int index = 0;
-			for (Player p : instance.loggedIn) {
-				if (p.getName().equals(player.getName()))
-					index = instance.loggedIn.indexOf(p);
+			try {
+				// Create connection
+				Connection conn = DriverManager.getConnection(url, user, pass);
+				String query = "DELETE FROM `" + logintable + "` WHERE username='" + player.getName() + "'";
+				Statement delete = conn.createStatement();
+				delete.executeUpdate(query);
+				
+				// Remove player from loggedIn list
+				int index = 0;
+				for (Player p : instance.loggedIn) {
+					if (p.getName().equals(player.getName()))
+						index = instance.loggedIn.indexOf(p);
+				}
+				instance.loggedIn.remove(index);
+				
+				// Add player to unregistered list
+				instance.unregistered.add(player);
+				
+				// Inform the player that they have been unregistered from the server
+				player.sendMessage("Successfully unregistered, goodbye!");
+				r = true;
+				
+			} catch (SQLException se) {
+				se.printStackTrace();
 			}
-			instance.loggedIn.remove(index);
-			
-			// Add player to unregistered list
-			instance.unregistered.add(player);
-			
-			// Inform the player that they have been unregistered from the server
-			player.sendMessage("Successfully unregistered, goodbye!");
-			r = true;
-			
-		} catch (SQLException se) {
-			se.printStackTrace();
 		}
-		
+		else {
+			instance.logInfo("This is an in-game only command.");
+			r = true;
+		}
 		return r;
 	}
 

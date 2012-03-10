@@ -46,7 +46,7 @@ public class BAPlayerListener implements Listener {
 			while (result.next()) {
 				String user = result.getString(1);
 				boolean allowed = (result.getInt(2) == 1 ? true : false);
-				if (user.equals(event.getPlayer().getName())) // Player found
+				if (user.equalsIgnoreCase(event.getPlayer().getName())) // Player found
 					if (allowed == true)
 						whitelisted = true;
 			}
@@ -70,7 +70,7 @@ public class BAPlayerListener implements Listener {
 					boolean playerFound = false;
 					do {
 						String username = result.getString(1);
-						if (username.equals(player.getName())) { // Player
+						if (username.equalsIgnoreCase(player.getName())) { // Player
 																		// data
 																		// found
 							playerFound = true;

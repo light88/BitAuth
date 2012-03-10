@@ -39,85 +39,91 @@ public class Login implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
 		boolean r = false;
-		Player player = (Player)sender;
-		
-		try {
-			boolean isLoggedIn = false;
-			for (Player p : instance.loggedIn) {
-				if (p.getName().equals(player.getName()))
-					isLoggedIn = true;
-			}
+		if (sender instanceof Player) {
+			Player player = (Player)sender;
 			
-			if (!isLoggedIn) {
-				// Create connection
-				Connection conn = DriverManager.getConnection(url, user, pass);
+			try {
+				boolean isLoggedIn = false;
+				for (Player p : instance.loggedIn) {
+					if (p.getName().equals(player.getName()))
+						isLoggedIn = true;
+				}
 				
-				Statement select = conn.createStatement();
-				ResultSet result = select.executeQuery(
-						"SELECT * FROM `" + logintable + "` WHERE username='" + player.getName() + "'");
-				if (result.next()) { // Results found
-					byte[] salt = result.getBytes(2);
-					byte[] hash = result.getBytes(3);
-					byte[] passwordCheck = GenerateHash(split[0], salt);
-					long playerIP = result.getLong(6);
-					boolean checkIP = result.getBoolean(7);
+				if (!isLoggedIn) {
+					// Create connection
+					Connection conn = DriverManager.getConnection(url, user, pass);
 					
-					// Get player IP
-					InetAddress iAddress = player.getAddress().getAddress();
-					long currentIP = instance.ipToLong(iAddress.getHostAddress());
-					
-					// Check player IP if necessary
-					if ((!checkIP) || (checkIP && playerIP == currentIP)) { // IP addresses match
-						if (instance.byteToString(passwordCheck).equals(
-								instance.byteToString(hash))) { // Passwords match
-							player.sendMessage(ChatColor.GREEN
-									+ "Password correct, welcome back "
-									+ player.getName());
-							
-							// Get unix time stamp
-							long unixtime = System.currentTimeMillis() / 1000L;
-							
-							// Set up the query
-							String query = "UPDATE `" + logintable + "` SET lastlogintime='" +
-									unixtime + "' WHERE username='" + player.getName() + "'";
-							PreparedStatement statement = conn.prepareStatement(query);
-							statement.executeUpdate();
-							statement.close();
-							
-							// Add player to the logged in list
-							instance.loggedIn.add(player);
-							
-							// Remove player from requireLogin list
-							int index = 0;
-							for (Player p : instance.requireLogin) {
-								if (p.getName().equals(player.getName()))
-									index = instance.requireLogin.indexOf(p);
+					Statement select = conn.createStatement();
+					ResultSet result = select.executeQuery(
+							"SELECT * FROM `" + logintable + "` WHERE username='" + player.getName() + "'");
+					if (result.next()) { // Results found
+						byte[] salt = result.getBytes(2);
+						byte[] hash = result.getBytes(3);
+						byte[] passwordCheck = GenerateHash(split[0], salt);
+						long playerIP = result.getLong(6);
+						boolean checkIP = result.getBoolean(7);
+						
+						// Get player IP
+						InetAddress iAddress = player.getAddress().getAddress();
+						long currentIP = instance.ipToLong(iAddress.getHostAddress());
+						
+						// Check player IP if necessary
+						if ((!checkIP) || (checkIP && playerIP == currentIP)) { // IP addresses match
+							if (instance.byteToString(passwordCheck).equals(
+									instance.byteToString(hash))) { // Passwords match
+								player.sendMessage(ChatColor.GREEN
+										+ "Password correct, welcome back "
+										+ player.getName());
+								
+								// Get unix time stamp
+								long unixtime = System.currentTimeMillis() / 1000L;
+								
+								// Set up the query
+								String query = "UPDATE `" + logintable + "` SET lastlogintime='" +
+										unixtime + "' WHERE username='" + player.getName() + "'";
+								PreparedStatement statement = conn.prepareStatement(query);
+								statement.executeUpdate();
+								statement.close();
+								
+								// Add player to the logged in list
+								instance.loggedIn.add(player);
+								
+								// Remove player from requireLogin list
+								int index = 0;
+								for (Player p : instance.requireLogin) {
+									if (p.getName().equals(player.getName()))
+										index = instance.requireLogin.indexOf(p);
+								}
+								instance.requireLogin.remove(index);
+								if (instance.requireLogin.indexOf(player) > 0)
+									instance.requireLogin.remove(player);
 							}
-							instance.requireLogin.remove(index);
-							if (instance.requireLogin.indexOf(player) > 0)
-								instance.requireLogin.remove(player);
+							else { // Passwords do not match
+								player.sendMessage(ChatColor.GREEN + "Password incorrect, try again.");
+							}
 						}
-						else { // Passwords do not match
-							player.sendMessage(ChatColor.GREEN + "Password incorrect, try again.");
+						else { // IP addresses do not match
+							player.sendMessage(new String[] {
+									ChatColor.GREEN
+											+ "Looks like you are under lockdown and your IP doesn't match.",
+									ChatColor.GREEN
+											+ "If this is an error, contact an admin in IRC." });
 						}
+						r = true;
 					}
-					else { // IP addresses do not match
-						player.sendMessage(new String[] {
-								ChatColor.GREEN
-										+ "Looks like you are under lockdown and your IP doesn't match.",
-								ChatColor.GREEN
-										+ "If this is an error, contact an admin in IRC." });
-					}
+				}
+				else {
+					player.sendMessage(ChatColor.GREEN + "You are already logged in, silly!");
 					r = true;
 				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			else {
-				player.sendMessage(ChatColor.GREEN + "You are already logged in, silly!");
-				r = true;
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		}
+		else {
+			instance.logInfo("This is an in-game only command.");
+			r = true;
 		}
 		
 		return r;
