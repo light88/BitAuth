@@ -21,7 +21,7 @@ public class Config {
 				file.createNewFile();
 				addDefaults();
 			} catch (Exception e) {
-				System.out.println(instance.getDescription().getName()
+				instance.logInfo(instance.getDescription().getName()
 						+ ": Unable to create config file.");
 			}
 		} else {
@@ -34,7 +34,7 @@ public class Config {
 			YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 			return config;
 		} catch (Exception e) {
-			System.out.println(instance.getDescription().getName() +
+			instance.logInfo(instance.getDescription().getName() +
 					": Unable to load config file.");
 		}
 		return null;
@@ -54,7 +54,7 @@ public class Config {
 	}
 	
 	private void loadKeys() {
-		System.out.println("Loading Config File...");
+		instance.logInfo("Loading Config File...");
 		instance.enabled = readBoolean(instance.enableOnStart);
 	}
 	
@@ -64,7 +64,7 @@ public class Config {
 		try {
 			config.save(file);
 		} catch (IOException e) {
-			System.out.println("There was an error saving configuration to file " + file.getName());
+			instance.logInfo("There was an error saving configuration to file " + file.getName());
 		}
 	}
 	

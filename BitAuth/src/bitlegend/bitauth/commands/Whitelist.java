@@ -108,6 +108,30 @@ public class Whitelist implements CommandExecutor {
 							r = true;
 						}
 					}
+					if (split.length == 1) {
+						if (split[0].equals("enable")) { // Enable whitelist
+							// Check current whitelist state
+							boolean wl = instance.config.readBoolean("Use_Whitelist");
+							if (wl == false) {
+								instance.config.write("Use_Whitelist", true);
+								player.sendMessage(ChatColor.GREEN + "Whitelist enabled");
+							}
+							else
+								player.sendMessage(ChatColor.GREEN + "Whitelist is already enabled");
+							r = true;
+						}
+						if (split[0].equals("disable")) { // Disable whitelist
+							// Check current whitelist state
+							boolean wl = instance.config.readBoolean("Use_Whitelist");
+							if (wl == true) {
+								instance.config.write("Use_Whitelist", false);
+								player.sendMessage(ChatColor.GREEN + "Whitelist disabled");
+							}
+							else
+								player.sendMessage(ChatColor.GREEN + "Whitelist is already disabled");
+							r = true;
+						}
+					}
 				} catch (SQLException se) {
 					se.printStackTrace();
 				}
@@ -176,11 +200,35 @@ public class Whitelist implements CommandExecutor {
 						result.close();
 						conn.close();
 						
-						// Report back to player
-						System.out.println(split[1]
+						// Report back to console
+						instance.logInfo(split[1]
 								+ " has been "
 								+ ((addremove == true) ? "added to" : "removed from")
 								+ " the whitelist");
+						r = true;
+					}
+				}
+				if (split.length == 1) {
+					if (split[0].equals("enable")) { // Enable whitelist
+						// Check current whitelist state
+						boolean wl = instance.config.readBoolean("Use_Whitelist");
+						if (wl == false) {
+							instance.config.write("Use_Whitelist", true);
+							instance.logInfo("Whitelist enabled");
+						}
+						else
+							instance.logInfo("Whitelist is already enabled");
+						r = true;
+					}
+					if (split[0].equals("disable")) { // Disable whitelist
+						// Check current whitelist state
+						boolean wl = instance.config.readBoolean("Use_Whitelist");
+						if (wl == true) {
+							instance.config.write("Use_Whitelist", false);
+							instance.logInfo("Whitelist disabled");
+						}
+						else
+							instance.logInfo("Whitelist is already disabled");
 						r = true;
 					}
 				}
