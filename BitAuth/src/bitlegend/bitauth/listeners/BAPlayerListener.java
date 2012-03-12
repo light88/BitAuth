@@ -199,24 +199,37 @@ public class BAPlayerListener implements Listener {
 		}
 		
 		boolean remove = false, remove2 = false, remove3 = false;
-		for (int ii = 0; ii < index.length; ii++) {
-			if (index[ii] > -1)
+		int iii = 0, jjj = 0, kkk = 0;
+		int rindex = 0, rindex2 = 0, rindex3 = 0;
+		
+		while (iii < index.length) {
+			if (index[iii] > -1) {
 				remove = true;
-			if (remove == true)
-				instance.unregistered.remove(ii);
+				rindex = iii;
+			}
+			iii++;
 		}
-		for (int ii = 0; ii < index2.length; ii++) {
-			if (index2[ii] > -1)
+		while (jjj < index2.length) {
+			if (index2[jjj] > -1) {
 				remove2 = true;
-			if (remove2 == true)
-				instance.requireLogin.remove(ii);
+				rindex2 = jjj;
+			}
+			jjj++;
 		}
-		for (int ii = 0; ii < index3.length; ii++) {
-			if (index3[ii] > -1)
+		while (kkk < index3.length) {
+			if (index3[kkk] > -1) {
 				remove3 = true;
-			if (remove3 == true)
-				instance.loggedIn.remove(ii);
+				rindex3 = kkk;
+			}
+			kkk++;
 		}
+		
+		if (remove == true)
+			instance.unregistered.remove(rindex);
+		if (remove2 == true)
+			instance.requireLogin.remove(rindex2);
+		if (remove3 == true)
+			instance.loggedIn.remove(rindex3);
 	}
 	
 	@EventHandler
