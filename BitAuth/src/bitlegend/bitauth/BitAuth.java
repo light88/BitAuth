@@ -1,5 +1,6 @@
 package bitlegend.bitauth;
 
+import bitlegend.bitauth.commands.Chpasswd;
 import bitlegend.bitauth.commands.Ipcheck;
 import bitlegend.bitauth.commands.Login;
 import bitlegend.bitauth.commands.Logout;
@@ -79,6 +80,7 @@ public class BitAuth extends JavaPlugin {
 		getCommand("whitelist").setExecutor(new Whitelist(this));
 		getCommand("logout").setExecutor(new Logout(this));
 		getCommand("unregister").setExecutor(new Unregister(this));
+		getCommand("chpasswd").setExecutor(new Chpasswd(this));
 		
 		// Incomplete commands
 		//getCommand("pwreset").setExecutor(new Pwreset(this));

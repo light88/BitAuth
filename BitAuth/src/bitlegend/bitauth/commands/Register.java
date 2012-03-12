@@ -115,6 +115,9 @@ public class Register implements CommandExecutor {
 								index = instance.unregistered.indexOf(p);
 						}
 						instance.unregistered.remove(index);
+						
+						// Add player to the loggedIn list
+						instance.loggedIn.add(player);
 	
 						player.sendMessage(ChatColor.GREEN
 								+ "Thank you for registering with our server!");
