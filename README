@@ -43,3 +43,6 @@ Supported commands:
         description: Can be used to unregister your account or by an administrator to 
 		remove the account of another user
         usage: /unregister [username]
+    chpasswd:
+        description: Used to change your password
+        usage: /chpasswd <oldpass> <newpass>
