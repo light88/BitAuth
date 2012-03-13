@@ -101,7 +101,7 @@ public class Whitelist implements CommandExecutor {
 							conn.close();
 							
 							// Report back to player
-							player.sendMessage(ChatColor.GREEN + split[1]
+							player.sendMessage(ChatColor.YELLOW + split[1]
 									+ " has been "
 									+ ((addremove == true) ? "added to" : "removed from")
 									+ " the whitelist");
@@ -117,7 +117,7 @@ public class Whitelist implements CommandExecutor {
 								player.sendMessage(ChatColor.GREEN + "Whitelist enabled");
 							}
 							else
-								player.sendMessage(ChatColor.GREEN + "Whitelist is already enabled");
+								player.sendMessage(ChatColor.YELLOW + "Whitelist is already enabled");
 							r = true;
 						}
 						if (split[0].equals("disable")) { // Disable whitelist
@@ -128,7 +128,7 @@ public class Whitelist implements CommandExecutor {
 								player.sendMessage(ChatColor.GREEN + "Whitelist disabled");
 							}
 							else
-								player.sendMessage(ChatColor.GREEN + "Whitelist is already disabled");
+								player.sendMessage(ChatColor.YELLOW + "Whitelist is already disabled");
 							r = true;
 						}
 					}
@@ -137,7 +137,7 @@ public class Whitelist implements CommandExecutor {
 				}
 			}
 			else {
-				player.sendMessage(ChatColor.GREEN +
+				player.sendMessage(ChatColor.YELLOW +
 						"You do not have access to this feature.");
 				r = true;
 			}

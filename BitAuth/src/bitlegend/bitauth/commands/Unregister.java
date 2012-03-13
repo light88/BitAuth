@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -56,7 +57,7 @@ public class Unregister implements CommandExecutor {
 				instance.unregistered.add(player);
 				
 				// Inform the player that they have been unregistered from the server
-				player.sendMessage("Successfully unregistered, goodbye!");
+				player.sendMessage(ChatColor.GREEN + "Successfully unregistered, goodbye!");
 				r = true;
 				
 			} catch (SQLException se) {

@@ -83,7 +83,7 @@ public class Chpasswd implements CommandExecutor {
 							
 							player.sendMessage(ChatColor.GREEN + "Password updated successfully");
 						} else { // oldpasswd does not match current password
-							player.sendMessage(ChatColor.GREEN + "Incorrect password");
+							player.sendMessage(ChatColor.YELLOW + "Incorrect password");
 						}
 					}
 					

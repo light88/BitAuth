@@ -4,6 +4,7 @@ import bitlegend.bitauth.commands.Chpasswd;
 import bitlegend.bitauth.commands.Ipcheck;
 import bitlegend.bitauth.commands.Login;
 import bitlegend.bitauth.commands.Logout;
+import bitlegend.bitauth.commands.Pwreset;
 import bitlegend.bitauth.commands.Register;
 import bitlegend.bitauth.commands.Unregister;
 import bitlegend.bitauth.commands.Whitelist;
@@ -33,6 +34,7 @@ public class BitAuth extends JavaPlugin {
 	public List<Player> unregistered;
 	public List<Player> requireLogin;
 	public List<Player> loggedIn;
+	public List<Player> pwreset;
 	
 	private final BAPlayerListener playerListener = new BAPlayerListener(this);
 	private final BABlockListener blockListener = new BABlockListener(this);
@@ -61,6 +63,7 @@ public class BitAuth extends JavaPlugin {
 		unregistered = new ArrayList<Player>();
 		requireLogin = new ArrayList<Player>();
 		loggedIn = new ArrayList<Player>();
+		pwreset = new ArrayList<Player>();
 		
 		// Check the configuration
 		config.checkConfig();
@@ -81,9 +84,7 @@ public class BitAuth extends JavaPlugin {
 		getCommand("logout").setExecutor(new Logout(this));
 		getCommand("unregister").setExecutor(new Unregister(this));
 		getCommand("chpasswd").setExecutor(new Chpasswd(this));
-		
-		// Incomplete commands
-		//getCommand("pwreset").setExecutor(new Pwreset(this));
+		getCommand("pwreset").setExecutor(new Pwreset(this));
 	}
 	
 	public String byteToString(byte[] input) {

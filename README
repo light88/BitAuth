@@ -16,6 +16,7 @@ Whitelist table:
 
 Permission Nodes:
 	bitauth.whitelist
+	bitauth.pwreset
 
 Supported commands:
     register:

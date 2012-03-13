@@ -1,5 +1,5 @@
 name: BitAuth
-version: 0.0.2
+version: 0.0.3
 main: bitlegend.bitauth.BitAuth
 commands:
     register:
@@ -10,7 +10,7 @@ commands:
         usage: /login <password>
     pwreset:
         description: Administrative command, resets a players password and forces a new one to be entered on next login
-        usage: /pwreset <username> <password>
+        usage: /pwreset <username> <temp password>
     ipcheck:
         description: Enable or disable IP checking on your account
         usage: /ipcheck <enable/disable>
@@ -31,6 +31,10 @@ permissions:
         description: Gives access to all BitAuth features
         children:
             bitauth.whitelist: true
+            bitauth.pwreset: true
     bitauth.whitelist:
         description: Allows you to modify the whitelist
+        default: op
+    bitauth.pwreset:
+        description: Allows you to reset user passwords
         default: op

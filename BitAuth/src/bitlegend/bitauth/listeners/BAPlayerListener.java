@@ -70,6 +70,7 @@ public class BAPlayerListener implements Listener {
 					boolean playerFound = false;
 					do {
 						String username = result.getString(1);
+						boolean pwreset = result.getInt(8) == 1 ? true : false;
 						if (username.equalsIgnoreCase(player.getName())) { // Player
 																		// data
 																		// found
@@ -84,6 +85,9 @@ public class BAPlayerListener implements Listener {
 							} else {
 								playerLoggedIn = true;
 							}
+							
+							if (pwreset == true) // Password reset
+								instance.pwreset.add(player);
 							
 							if (playerLoggedIn == true) {
 								boolean alreadyInList = false;
@@ -135,11 +139,23 @@ public class BAPlayerListener implements Listener {
 				});
 			}
 		}
-		for (Player p : instance.requireLogin) {
+		boolean pwreset = false;
+		for (Player p : instance.pwreset) {
 			if (p.getName().equals(event.getPlayer().getName())) {
 				p.sendMessage(new String[] { 
-						ChatColor.GREEN + "Please log in by typing:",
-						ChatColor.GREEN + "/login <password>" });
+						ChatColor.RED + "You need to reset your password! You can do this by typing:",
+						ChatColor.RED + "/login <temp password> <new password>"
+				});
+				pwreset = true;
+			}
+		}
+		if (pwreset == false) {
+			for (Player p : instance.requireLogin) {
+				if (p.getName().equals(event.getPlayer().getName())) {
+					p.sendMessage(new String[] { 
+							ChatColor.GREEN + "Please log in by typing:",
+							ChatColor.GREEN + "/login <password>" });
+				}
 			}
 		}
 		for (Player p : instance.loggedIn) {

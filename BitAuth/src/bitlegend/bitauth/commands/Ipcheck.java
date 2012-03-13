@@ -73,7 +73,7 @@ public class Ipcheck implements CommandExecutor {
 					}
 				}
 				else {
-					player.sendMessage("Error: Argument " + split[0] + " not recognized");
+					player.sendMessage(ChatColor.YELLOW + "Error: Argument " + split[0] + " not recognized");
 				}
 				r = true;
 			}

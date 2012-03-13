@@ -70,7 +70,7 @@ public class Logout implements CommandExecutor {
 			}
 			
 			else {
-				player.sendMessage(ChatColor.GREEN
+				player.sendMessage(ChatColor.YELLOW
 						+ "It appears that you are not logged in to begin with!");
 			}
 			
