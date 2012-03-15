@@ -46,6 +46,9 @@ public class BitAuth extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		// Check the configuration
+		config.checkConfig();
+		
 		// Check if config.yml was modified
 		if (!config.readString("DB_Host").equals("hostname")) {
 			if (tablesExist() != true) { // Check if tables exist
@@ -65,8 +68,7 @@ public class BitAuth extends JavaPlugin {
 		loggedIn = new ArrayList<Player>();
 		pwreset = new ArrayList<Player>();
 		
-		// Check the configuration
-		config.checkConfig();
+		// Check if whitelist is enabled
 		if (config.readBoolean("Use_Whitelist") == true)
 			logInfo("Starting with whitelist enabled");
 		else
