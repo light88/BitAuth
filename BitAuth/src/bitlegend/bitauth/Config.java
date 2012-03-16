@@ -44,6 +44,7 @@ public class Config {
 		System.out.println("Generating Config file...");
 		write(instance.enableOnStart, true);
 		write("Use_Whitelist", false);
+		write("Login_Time_Limit", 120);
 		write("DB_User", "username");
 		write("DB_Name", "database");
 		write("DB_Pass", "password");

@@ -50,7 +50,7 @@ public class BitAuth extends JavaPlugin {
 		config.checkConfig();
 		
 		// Check if config.yml was modified
-		if (!config.readString("DB_Host").equals("hostname")) {
+		if (!config.readString("DB_Host").equals("hostipaddress")) {
 			if (tablesExist() != true) { // Check if tables exist
 				logInfo("Generating tables `"
 						+ config.readString("DB_Table_login") + "` and `"

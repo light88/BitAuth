@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 
 import bitlegend.bitauth.BitAuth;
+import bitlegend.bitauth.timers.Login;
 
 public class BAPlayerListener implements Listener {
 	private BitAuth instance;
@@ -24,6 +25,7 @@ public class BAPlayerListener implements Listener {
 	private String url = "";
 	private String logintable = "";
 	private String wltable = "";
+	private int logintimelimit = 0;
 	
 	public BAPlayerListener(BitAuth instance) {
 		this.instance = instance;
@@ -33,6 +35,7 @@ public class BAPlayerListener implements Listener {
 				"/" + instance.config.readString("DB_Name");
 		logintable = instance.config.readString("DB_Table_login");
 		wltable = instance.config.readString("DB_Table_whitelist");
+		logintimelimit = Integer.parseInt(instance.config.readString("Login_Time_Limit"));
 	}
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
@@ -137,6 +140,7 @@ public class BAPlayerListener implements Listener {
 						ChatColor.GREEN + "Not to fret though, you can register by simply typing:",
 						ChatColor.GREEN + "/register <password>" 
 				});
+				Login kick = new Login(p, logintimelimit, instance);
 			}
 		}
 		boolean pwreset = false;
@@ -147,6 +151,7 @@ public class BAPlayerListener implements Listener {
 						ChatColor.RED + "/login <temp password> <new password>"
 				});
 				pwreset = true;
+				Login kick = new Login(p, logintimelimit, instance);
 			}
 		}
 		if (pwreset == false) {
@@ -155,6 +160,7 @@ public class BAPlayerListener implements Listener {
 					p.sendMessage(new String[] { 
 							ChatColor.GREEN + "Please log in by typing:",
 							ChatColor.GREEN + "/login <password>" });
+					Login kick = new Login(p, logintimelimit, instance);
 				}
 			}
 		}
