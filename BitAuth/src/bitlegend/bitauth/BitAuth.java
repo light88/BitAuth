@@ -39,6 +39,8 @@ public class BitAuth extends JavaPlugin {
 	private final BAPlayerListener playerListener = new BAPlayerListener(this);
 	private final BABlockListener blockListener = new BABlockListener(this);
 	
+	private OnlineCheck check;
+	
 	@Override
 	public void onDisable() {
 		
@@ -67,6 +69,9 @@ public class BitAuth extends JavaPlugin {
 		requireLogin = new ArrayList<Player>();
 		loggedIn = new ArrayList<Player>();
 		pwreset = new ArrayList<Player>();
+		
+		// Start player check timer
+		check = new OnlineCheck();
 		
 		// Check if whitelist is enabled
 		if (config.readBoolean("Use_Whitelist") == true)
@@ -184,6 +189,39 @@ public class BitAuth extends JavaPlugin {
 			conn.close();
 		} catch (SQLException se) {
 			se.printStackTrace();
+		}
+	}
+	
+	// Inner class that runs a thread to check whether
+	// a player is still connected or not
+	private class OnlineCheck extends Thread {
+		OnlineCheck() {
+			start();
+		}
+		
+		public void run() {
+			while (true) {
+				try {
+					// Create a new list
+					List<Player> connectedList = new ArrayList<Player>();
+					
+					// Check players found in loggedIn with those actually connected
+					for (Player p : loggedIn) {
+						for (Player pl : getServer().getOnlinePlayers()) {
+							if (p.getName().equals(pl.getName()))
+								connectedList.add(p); // Add to new list if found
+						}
+					}
+					
+					// Replace old list with new list
+					loggedIn = connectedList;
+					
+					// Sleep for 1 minute
+					sleep(60000);
+				} catch (InterruptedException ie) {
+					ie.printStackTrace();
+				}
+			}
 		}
 	}
 }
