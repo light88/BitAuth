@@ -45,7 +45,7 @@ public class Pwreset implements CommandExecutor {
 		
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			if ((player.hasPermission("bitauth.pwreset") || player.isOp()) 
+			if ((instance.pex.has(player, "bitauth.pwreset") || player.isOp()) 
 					&& split.length == 2) { // Proper syntax usage and permission
 				String username = split[0];
 				String passwd = split[1];

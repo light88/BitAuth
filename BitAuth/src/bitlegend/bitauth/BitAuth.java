@@ -24,9 +24,13 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import ru.tehkode.permissions.PermissionManager;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 public class BitAuth extends JavaPlugin {
 	public PluginDescriptionFile pluginInfo = this.getDescription();
 	public Config config = new Config(this);
+	public PermissionManager pex;
 	public Logger log = Logger.getLogger("Minecraft"); // broken, causes nullPointerException
 	public String enableOnStart = "Enabled On Startup";
 	public boolean enabled;
@@ -50,6 +54,9 @@ public class BitAuth extends JavaPlugin {
 	public void onEnable() {
 		// Check the configuration
 		config.checkConfig();
+		
+		// Get permission manager
+		pex = PermissionsEx.getPermissionManager();
 		
 		// Check if config.yml was modified
 		if (!config.readString("DB_Host").equals("hostipaddress")) {
