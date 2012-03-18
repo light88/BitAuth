@@ -12,6 +12,7 @@ public class Config {
 	
 	public Config(BitAuth instance) {
 		this.instance = instance;
+		checkConfig();
 	}
 	
 	public void checkConfig() {
@@ -21,8 +22,7 @@ public class Config {
 				file.createNewFile();
 				addDefaults();
 			} catch (Exception e) {
-				instance.logInfo(instance.getDescription().getName()
-						+ ": Unable to create config file.");
+				instance.logInfo("Unable to create config file.");
 			}
 		} else {
 			loadKeys();
@@ -34,14 +34,13 @@ public class Config {
 			YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 			return config;
 		} catch (Exception e) {
-			instance.logInfo(instance.getDescription().getName() +
-					": Unable to load config file.");
+			instance.logInfo("Unable to load config file.");
 		}
 		return null;
 	}
 	
 	private void addDefaults() {
-		System.out.println("Generating Config file...");
+		instance.logInfo("Generating Config file...");
 		write(instance.enableOnStart, true);
 		write("Use_Whitelist", false);
 		write("Login_Time_Limit", 120);

@@ -29,7 +29,6 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class BitAuth extends JavaPlugin {
 	public PluginDescriptionFile pluginInfo = this.getDescription();
-	public Config config = new Config(this);
 	public PermissionManager pex;
 	public Logger log = Logger.getLogger("Minecraft"); // broken, causes nullPointerException
 	public String enableOnStart = "Enabled On Startup";
@@ -39,6 +38,8 @@ public class BitAuth extends JavaPlugin {
 	public List<Player> requireLogin;
 	public List<Player> loggedIn;
 	public List<Player> pwreset;
+	
+	public Config config = new Config(this);
 	
 	private final BAPlayerListener playerListener = new BAPlayerListener(this);
 	private final BABlockListener blockListener = new BABlockListener(this);
@@ -52,9 +53,6 @@ public class BitAuth extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		// Check the configuration
-		config.checkConfig();
-		
 		// Get permission manager
 		pex = PermissionsEx.getPermissionManager();
 		
