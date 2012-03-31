@@ -1,49 +1,5 @@
 Authorization and whitelisting solution for Bitlegend. Built from the ground up for Minecraft/Bukkit 1.2.3. We needed a simple, easy to manage solution for authorization due to the pirate-friendly nature of our server. After having no luck with popular authorization plugins (the update cycles are ridiculously long - as you would expect from significantly more complex plugins), I decided to write our own. I wanted to create a simple, easy to use and lightweight authorization plugin, and that's exactly what I've done.
 
-Things to be done:
-	* Permission handling and nodes
-	* Login and registration time limits (e.g. 2 minutes then kicked)
-	* Set up a password reset system
+Make sure to check the plugin.yml file for permission nodes and commands!
 
 Supported database types: MySQL
-
-Login table:
-	Columns: username (text), salt (blob), password [hash] (blob), whitelist 
-		(tinyint), lastlogintime (bigint), ipaddress (bigint), enableipcheck
-		(tinyint), pwreset (tinyint), temppwd (blob), tmpsalt (blob)
-Whitelist table:
-	Columns: username (text), enabled (tinyint)
-
-Permission Nodes:
-	bitauth.whitelist
-	bitauth.pwreset
-
-Supported commands:
-    register:
-        description: Registers to the server
-        usage: /register <password>
-    login:
-        description: Log in to the server
-        usage: /login <password>
-    pwreset:
-        description: Administrative command, resets a players password and forces a 
-		new one to be entered on next login
-        usage: /pwreset <username> <password>
-    ipcheck:
-        description: Enable or disable IP checking on your account
-        usage: /ipcheck <enable/disable>
-    whitelist:
-        description: Administrative command, adds or removes a specified player from 
-		the whitelist
-        usage: /whitelist <add/del> <username>
-    logout:
-        description: Terminate your current session, requires the user to log back in 
-		to play
-        usage: /logout
-    unregister:
-        description: Can be used to unregister your account or by an administrator to 
-		remove the account of another user
-        usage: /unregister [username]
-    chpasswd:
-        description: Used to change your password
-        usage: /chpasswd <oldpass> <newpass>
