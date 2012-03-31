@@ -19,7 +19,7 @@ commands:
         usage: /whitelist <add/del> <username>
     logout:
         description: Terminate your current session, requires the user to log back in to play
-        usage: /logout
+        usage: /logout <username>
     unregister:
         description: Can be used to unregister your account or by an administrator to remove the account of another user
         usage: /unregister [username]
@@ -32,9 +32,13 @@ permissions:
         children:
             bitauth.whitelist: true
             bitauth.pwreset: true
+            bitauth.logout: true
     bitauth.whitelist:
         description: Allows you to modify the whitelist
         default: op
     bitauth.pwreset:
         description: Allows you to reset user passwords
+        default: op
+    bitauth.logout:
+        description: Allows you to forcefully log a user out
         default: op

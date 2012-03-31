@@ -20,13 +20,12 @@ public class BAEntityListener implements Listener {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
 			Player player = (Player)entity;
-			boolean isLoggedIn = false;
-			for (Player p : instance.loggedIn)
-				// Player found in logged in list
+			for (Player p : instance.requireLogin)
 				if (p.getName().equals(player.getName()))
-					isLoggedIn = true;
-			if (isLoggedIn == false)
-				event.setCancelled(true);
+					event.setCancelled(true);
+			for (Player p : instance.unregistered)
+				if (p.getName().equals(player.getName()))
+					event.setCancelled(true);
 		}
 	}
 }

@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import bitlegend.bitauth.BitAuth;
@@ -33,54 +34,120 @@ public class Logout implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
-		boolean r = true; // You can't really fail to type this command properly
-		
+		boolean r = false;
+
 		if (sender instanceof Player) {
-			Player player = (Player)sender;
-	
-			// Find the player in the loggedIn list
-			int index = 0;
-			boolean playerFound = false;
-			for (Player p : instance.loggedIn) {
-				if (p.getName().equals(player.getName())) {
-					index = instance.loggedIn.indexOf(p);
-					playerFound = true;
-				}
-			}
-			
-			if (playerFound == true) {
-				// Remove the player from the loggedIn list
-				instance.loggedIn.remove(index);
-				
-				// Add the player to the requireLogin list
-				instance.requireLogin.add(player);
-				
-				try {
-					Connection conn = DriverManager.getConnection(url, user, pass);
-					String query = "UPDATE `" + logintable + "` SET lastlogintime='1' WHERE username='"
-							+ player.getName() + "'";
-					Statement update = conn.createStatement();
-					update.executeUpdate(query);
+			Player psend = (Player)sender;
+			if (instance.pex.has(psend, "bitauth.logout") || psend.isOp()) {
+				// Arguments are of proper length
+				if (split.length == 1) {
+					r = true;
+					// Get target players name
+					String name = split[0];
+					Player player = null;
+					boolean playerFound = false;
 					
-					update.close();
-					conn.close();
-				} catch (SQLException se) {
-					se.printStackTrace();
+					// Look for player in list of connections
+					for (Player p : instance.getServer().getOnlinePlayers())
+						if (p.getName().equals(name)) {
+							player = p;
+							playerFound = true;
+						}
+					
+					if (playerFound == true) {
+						// Remove the player from the loggedIn list
+						instance.loggedIn.remove(player);
+						
+						// Add the player to the requireLogin list
+						instance.requireLogin.add(player);
+						
+						try {
+							// Create connection
+							Connection conn = DriverManager.getConnection(url, user, pass);
+							// Query to reset last login time to 1
+							String query = "UPDATE `"
+									+ logintable
+									+ "` SET lastlogintime='1' WHERE username='"
+									+ player.getName() + "'";
+							// Create statement object
+							Statement update = conn.createStatement();
+							// Execute update
+							update.executeUpdate(query);
+							
+							// Message sender
+							psend.sendMessage(ChatColor.YELLOW + 
+									"Player " + name + " has been logged out");
+							
+							// Message recipient
+							player.sendMessage(ChatColor.YELLOW + "You have been logged out");
+							
+							// Clean up
+							update.close();
+							conn.close();
+						} catch (SQLException se) {
+							se.printStackTrace();
+						}
+					}
 				}
 			}
-			
 			else {
-				player.sendMessage(ChatColor.YELLOW
-						+ "It appears that you are not logged in to begin with!");
+				psend.sendMessage(ChatColor.YELLOW +
+						"You do not have access to this feature.");
+				r = true;
 			}
-			
-			if (playerFound == true)
-				player.sendMessage(ChatColor.GREEN + "Successfully logged out");
 		}
-		else {
-			instance.logInfo("This is an in-game only command.");
-			r = true;
+		
+		if (sender instanceof ConsoleCommandSender) {
+			// Arguments are of proper length
+			if (split.length == 1) {
+				r = true;
+				// Get target players name
+				String name = split[0];
+				Player player = null;
+				boolean playerFound = false;
+				
+				// Look for player in list of connections
+				for (Player p : instance.getServer().getOnlinePlayers())
+					if (p.getName().equals(name)) {
+						player = p;
+						playerFound = true;
+					}
+				
+				if (playerFound == true) {
+					// Remove the player from the loggedIn list
+					instance.loggedIn.remove(player);
+					
+					// Add the player to the requireLogin list
+					instance.requireLogin.add(player);
+					
+					try {
+						// Create connection
+						Connection conn = DriverManager.getConnection(url, user, pass);
+						// Query to reset last login time to 1
+						String query = "UPDATE `" + logintable
+								+ "` SET lastlogintime='1' WHERE username='"
+								+ player.getName() + "'";
+						// Create statement object
+						Statement update = conn.createStatement();
+						// Execute update
+						update.executeUpdate(query);
+						
+						// Message console
+						instance.logInfo("Player " + name + " has been logged out");
+						
+						// Message recipient
+						player.sendMessage(ChatColor.YELLOW + "You have been logged out");
+						
+						// Clean up
+						update.close();
+						conn.close();
+					} catch (SQLException se) {
+						se.printStackTrace();
+					}
+				}
+			}
 		}
+
 		return r;
 	}
 
