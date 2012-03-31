@@ -43,6 +43,7 @@ public class BitAuth extends JavaPlugin {
 	
 	private final BAPlayerListener playerListener = new BAPlayerListener(this);
 	private final BABlockListener blockListener = new BABlockListener(this);
+	private final BAEntityListener entityListener = new BAEntityListener(this);
 	
 	private OnlineCheck check;
 	
@@ -87,6 +88,7 @@ public class BitAuth extends JavaPlugin {
 		// Register events
 		pm.registerEvents(this.playerListener, this);
 		pm.registerEvents(this.blockListener, this);
+		pm.registerEvents(this.entityListener, this);
 		
 		// Register commands
 		getCommand("register").setExecutor(new Register(this));
