@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 public class HashManager {
+	//Test
 	public static byte[] GenerateSalt() {
 		Random r = new SecureRandom();
 		byte[] salt = new byte[20];
