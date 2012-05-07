@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+<<<<<<< HEAD
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="D:/Documents/Archive/Jars/bukkit-1.2.5-R1.4-20120506.060054-3.jar"/>
+=======
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="D:/Documents/Archive/Jars/bukkit-1.2.3-R0.1.jar"/>
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 	<classpathentry kind="lib" path="D:/Documents/Archive/Jars/PermissionsEx.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

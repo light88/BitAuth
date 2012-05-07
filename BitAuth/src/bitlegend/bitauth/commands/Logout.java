@@ -150,4 +150,8 @@ public class Logout implements CommandExecutor {
 
 		return r;
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 }

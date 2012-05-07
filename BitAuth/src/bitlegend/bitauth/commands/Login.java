@@ -1,11 +1,23 @@
 package bitlegend.bitauth.commands;
 
+<<<<<<< HEAD
 import java.net.InetAddress;
+=======
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+<<<<<<< HEAD
+=======
+import java.util.Random;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -14,7 +26,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import bitlegend.bitauth.BitAuth;
+<<<<<<< HEAD
 import bitlegend.bitauth.HashManager;
+=======
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 public class Login implements CommandExecutor {
 	private BitAuth instance;
@@ -58,7 +73,11 @@ public class Login implements CommandExecutor {
 						if (result.next()) { // Results found
 							byte[] salt = result.getBytes(2);
 							byte[] hash = result.getBytes(3);
+<<<<<<< HEAD
 							byte[] passwordCheck = HashManager.GenerateHash(split[0], salt);
+=======
+							byte[] passwordCheck = GenerateHash(split[0], salt);
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 							boolean pwreset = result.getInt(8) == 1 ? true : false;
 							long playerIP = result.getLong(6);
 							boolean checkIP = result.getBoolean(7);
@@ -72,7 +91,11 @@ public class Login implements CommandExecutor {
 								if (pwreset == true) {
 									hash = result.getBytes(9);
 									salt = result.getBytes(10);
+<<<<<<< HEAD
 									passwordCheck = HashManager.GenerateHash(split[0], salt);
+=======
+									passwordCheck = GenerateHash(split[0], salt);
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 									
 									if (split.length == 1) { // They didn't include the new password or don't know their password has been reset
 										player.sendMessage(ChatColor.YELLOW + "Reset your password: /login <temp passwd> <new passwd>");
@@ -89,8 +112,13 @@ public class Login implements CommandExecutor {
 												long unixtime = System.currentTimeMillis() / 1000L;
 												
 												// Create new salt and password hash
+<<<<<<< HEAD
 												byte[] newsalt = HashManager.GenerateSalt();
 												byte[] newhash = HashManager.GenerateHash(split[1], newsalt);
+=======
+												byte[] newsalt = GenerateSalt();
+												byte[] newhash = GenerateHash(split[1], newsalt);
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 												
 												// Create query
 												String query = "UPDATE `"
@@ -199,4 +227,25 @@ public class Login implements CommandExecutor {
 		
 		return r;
 	}
+<<<<<<< HEAD
+=======
+	
+	private byte[] GenerateSalt() {
+		Random r = new SecureRandom();
+		byte[] salt = new byte[20];
+		r.nextBytes(salt);
+		
+		return salt;
+	}
+	
+	private byte[] GenerateHash(String input, byte[] salt)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		MessageDigest md = MessageDigest.getInstance("SHA-512");
+		md.reset();
+		md.update(salt);
+		
+		return md.digest(input.getBytes("UTF-8"));
+	}
+
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 }

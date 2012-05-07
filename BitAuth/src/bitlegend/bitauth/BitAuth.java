@@ -1,6 +1,17 @@
 package bitlegend.bitauth;
 
+<<<<<<< HEAD
 import bitlegend.bitauth.commands.*;
+=======
+import bitlegend.bitauth.commands.Chpasswd;
+import bitlegend.bitauth.commands.Ipcheck;
+import bitlegend.bitauth.commands.Login;
+import bitlegend.bitauth.commands.Logout;
+import bitlegend.bitauth.commands.Pwreset;
+import bitlegend.bitauth.commands.Register;
+import bitlegend.bitauth.commands.Unregister;
+import bitlegend.bitauth.commands.Whitelist;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 import bitlegend.bitauth.listeners.*;
 
 import java.sql.Connection;
@@ -38,7 +49,10 @@ public class BitAuth extends JavaPlugin {
 	private final BABlockListener blockListener = new BABlockListener(this);
 	private final BAEntityListener entityListener = new BAEntityListener(this);
 	
+<<<<<<< HEAD
 	@SuppressWarnings("unused")
+=======
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 	private OnlineCheck check;
 	
 	@Override
@@ -93,7 +107,10 @@ public class BitAuth extends JavaPlugin {
 		getCommand("unregister").setExecutor(new Unregister(this));
 		getCommand("chpasswd").setExecutor(new Chpasswd(this));
 		getCommand("pwreset").setExecutor(new Pwreset(this));
+<<<<<<< HEAD
 		getCommand("jumblepw").setExecutor(new Jumblepw(this));
+=======
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 	}
 	
 	public String byteToString(byte[] input) {

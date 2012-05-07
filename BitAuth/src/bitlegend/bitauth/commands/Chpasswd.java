@@ -1,13 +1,23 @@
 package bitlegend.bitauth.commands;
 
 import java.io.UnsupportedEncodingException;
+<<<<<<< HEAD
 import java.security.NoSuchAlgorithmException;
+=======
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+<<<<<<< HEAD
+=======
+import java.util.Random;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -16,7 +26,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import bitlegend.bitauth.BitAuth;
+<<<<<<< HEAD
 import bitlegend.bitauth.HashManager;
+=======
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 public class Chpasswd implements CommandExecutor {
 	private BitAuth instance;
@@ -57,11 +70,19 @@ public class Chpasswd implements CommandExecutor {
 						byte[] salt = result.getBytes(2);
 						byte[] pwdhash = result.getBytes(3);
 						
+<<<<<<< HEAD
 						byte[] pwdtest = HashManager.GenerateHash(oldpasswd, salt);
 						if (instance.byteToString(pwdtest).equals(instance.byteToString(pwdhash))) { // oldpasswd matches current password
 							// Generate new salt for password and new password hash from the input + salt
 							byte[] newsalt = HashManager.GenerateSalt();
 							byte[] newpass = HashManager.GenerateHash(newpasswd, newsalt);
+=======
+						byte[] pwdtest = GenerateHash(oldpasswd, salt);
+						if (instance.byteToString(pwdtest).equals(instance.byteToString(pwdhash))) { // oldpasswd matches current password
+							// Generate new salt for password and new password hash from the input + salt
+							byte[] newsalt = GenerateSalt();
+							byte[] newpass = GenerateHash(newpasswd, newsalt);
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 							// Create query and statement
 							String query = "UPDATE `" + logintable
@@ -103,4 +124,25 @@ public class Chpasswd implements CommandExecutor {
 		
 		return r;
 	}
+<<<<<<< HEAD
+=======
+	
+	private byte[] GenerateSalt() {
+		Random r = new SecureRandom();
+		byte[] salt = new byte[20];
+		r.nextBytes(salt);
+		
+		return salt;
+	}
+	
+	private byte[] GenerateHash(String input, byte[] salt)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		MessageDigest md = MessageDigest.getInstance("SHA-512");
+		md.reset();
+		md.update(salt);
+
+		return md.digest(input.getBytes("UTF-8"));
+	}
+
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 }

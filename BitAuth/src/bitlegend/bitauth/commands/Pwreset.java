@@ -1,13 +1,23 @@
 package bitlegend.bitauth.commands;
 
 import java.io.UnsupportedEncodingException;
+<<<<<<< HEAD
 import java.security.NoSuchAlgorithmException;
+=======
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+<<<<<<< HEAD
+=======
+import java.util.Random;
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -17,7 +27,10 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import bitlegend.bitauth.BitAuth;
+<<<<<<< HEAD
 import bitlegend.bitauth.HashManager;
+=======
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 public class Pwreset implements CommandExecutor {
 	private BitAuth instance;
@@ -57,8 +70,13 @@ public class Pwreset implements CommandExecutor {
 					
 					if (result.next()) { // Data found
 						// Generate new password
+<<<<<<< HEAD
 						byte[] salt = HashManager.GenerateSalt();
 						byte[] pass = HashManager.GenerateHash(passwd, salt);
+=======
+						byte[] salt = GenerateSalt();
+						byte[] pass = GenerateHash(passwd, salt);
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 						
 						// Create update query
 						String queryUpdate = "UPDATE `"
@@ -118,8 +136,13 @@ public class Pwreset implements CommandExecutor {
 					
 					if (result.next()) { // Data found
 						// Generate new password
+<<<<<<< HEAD
 						byte[] salt = HashManager.GenerateSalt();
 						byte[] pass = HashManager.GenerateHash(passwd, salt);
+=======
+						byte[] salt = GenerateSalt();
+						byte[] pass = GenerateHash(passwd, salt);
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 						
 						// Create update query
 						String queryUpdate = "UPDATE `"
@@ -164,4 +187,24 @@ public class Pwreset implements CommandExecutor {
 		
 		return r;
 	}
+<<<<<<< HEAD
+=======
+	
+	private byte[] GenerateSalt() {
+		Random r = new SecureRandom();
+		byte[] salt = new byte[20];
+		r.nextBytes(salt);
+		
+		return salt;
+	}
+	
+	private byte[] GenerateHash(String input, byte[] salt)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		MessageDigest md = MessageDigest.getInstance("SHA-512");
+		md.reset();
+		md.update(salt);
+
+		return md.digest(input.getBytes("UTF-8"));
+	}
+>>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 }
