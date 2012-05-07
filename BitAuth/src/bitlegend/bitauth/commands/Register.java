@@ -10,20 +10,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ConcurrentModificationException;
-<<<<<<< HEAD
-=======
-import java.util.Random;
->>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import bitlegend.bitauth.BitAuth;
-<<<<<<< HEAD
 import bitlegend.bitauth.HashManager;
-=======
->>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 
 public class Register implements CommandExecutor {
 	private BitAuth instance;
@@ -77,13 +70,8 @@ public class Register implements CommandExecutor {
 					
 					if (playerFound == false) { // Player not found
 						// Generate new salt and password from salt and input
-<<<<<<< HEAD
 						byte[] salt = HashManager.GenerateSalt();
 						byte[] hash = HashManager.GenerateHash(split[0], salt);
-=======
-						byte[] salt = GenerateSalt();
-						byte[] hash = GenerateHash(split[0], salt);
->>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 	
 						// Get unix time stamp
 						long unixtime = System.currentTimeMillis() / 1000L;
@@ -157,24 +145,4 @@ public class Register implements CommandExecutor {
 		}
 		return r;
 	}
-<<<<<<< HEAD
-=======
-	
-	private byte[] GenerateSalt() {
-		Random r = new SecureRandom();
-		byte[] salt = new byte[20];
-		r.nextBytes(salt);
-		
-		return salt;
-	}
-	
-	private byte[] GenerateHash(String input, byte[] salt)
-			throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		MessageDigest md = MessageDigest.getInstance("SHA-512");
-		md.reset();
-		md.update(salt);
-
-		return md.digest(input.getBytes("UTF-8"));
-	}
->>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 }

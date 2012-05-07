@@ -131,10 +131,7 @@ public class BAPlayerListener implements Listener {
 		}
 	}
 	
-<<<<<<< HEAD
 	@SuppressWarnings("unused")
-=======
->>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		for (Player p : instance.unregistered) {

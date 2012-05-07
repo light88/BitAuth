@@ -17,10 +17,6 @@ import org.bukkit.entity.Player;
 import bitlegend.bitauth.BitAuth;
 
 public class Whitelist implements CommandExecutor {
-<<<<<<< HEAD
-=======
-	@SuppressWarnings("unused")
->>>>>>> 0f5be3f78479f535a76fbb6716b87a93897d2335
 	private BitAuth instance;
 	
 	// Database info
