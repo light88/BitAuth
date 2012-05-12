@@ -1,5 +1,6 @@
 package bitlegend.bitauth.listeners;
 
+import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -80,19 +81,31 @@ public class BAPlayerListener implements Listener {
 							playerFound = true;
 							long lastlogintest = (System.currentTimeMillis() / 1000L) - 1800;
 							long lastlogintime = result.getLong(5);
+							long playerIP = result.getLong(6);
+							long currentIP = instance.ipToLong(event.getAddress().getHostAddress());
 							boolean playerLoggedIn = false;
 	
 							if (lastlogintime < lastlogintest) {
 								instance.requireLogin.add(player);
 								playerLoggedIn = false;
 							} else {
-								playerLoggedIn = true;
+								// Fix to prevent name spoofing from taking advantage
+								// of the 30 minute grace period
+								//System.out.println(currentIP + " ?= " + playerIP);
+								if (currentIP != playerIP) {
+									instance.logInfo("WARNING: Possible name-spoofer detected using name: "
+											+ player.getName());
+									playerLoggedIn = false;
+									instance.requireLogin.add(player);
+								}
+								else
+									playerLoggedIn = true;
 							}
 							
 							if (pwreset == true) // Password reset
 								instance.pwreset.add(player);
-							
-							if (playerLoggedIn == true) {
+
+							if (playerLoggedIn == true) {								
 								boolean alreadyInList = false;
 								boolean alreadyInList2 = false;
 								int index = 0;

@@ -26,6 +26,9 @@ commands:
     chpasswd:
         description: Used to change your password
         usage: /chpasswd <oldpass> <newpass>
+    jumblepw:
+        description: Used to permanently disable a user without banning them
+        usage: /jumblepw <username>
 permissions:
     bitauth.*:
         description: Gives access to all BitAuth features
@@ -41,4 +44,7 @@ permissions:
         default: op
     bitauth.logout:
         description: Allows you to forcefully log a user out
+        default: op
+    bitauth.jumble:
+        description: Allows you to jumble user passwords (disable the user more or less)
         default: op
