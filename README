@@ -1,5 +1,0 @@
-Authorization and whitelisting solution for Bitlegend. Built from the ground up for Minecraft/Bukkit 1.2.3. We needed a simple, easy to manage solution for authorization due to the pirate-friendly nature of our server. After having no luck with popular authorization plugins (the update cycles are ridiculously long - as you would expect from significantly more complex plugins), I decided to write our own. I wanted to create a simple, easy to use and lightweight authorization plugin, and that's exactly what I've done.
-
-Make sure to check the plugin.yml file for permission nodes and commands!
-
-Supported database types: MySQL
