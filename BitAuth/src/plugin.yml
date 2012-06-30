@@ -1,5 +1,5 @@
 name: BitAuth
-version: 1.0.5
+version: 1.1
 description: A lightweight authentication plugin. Uses MySQL.
 author: dechiridas
 website: http://www.dechiridas.com/
@@ -33,6 +33,9 @@ commands:
     jumblepw:
         description: Used to permanently disable a user without banning them
         usage: /jumblepw <username>
+    baversion:
+        description: Retrieve the version number of BitAuth
+        usage: /baversion
 permissions:
     bitauth.*:
         description: Gives access to all BitAuth features

@@ -70,5 +70,6 @@ public class BitAuth extends JavaPlugin {
 		getCommand("chpasswd").setExecutor(new Chpasswd(this));
 		getCommand("pwreset").setExecutor(new Pwreset(this));
 		getCommand("jumblepw").setExecutor(new Jumblepw(this));
+		getCommand("baversion").setExecutor(new Baversion(this));
 	}
 }
