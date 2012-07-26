@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Bitauth by dechiridas</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Bitauth</h1>
+        <p>Authentication plugin for Bukkit/Minecraft</p>
+
+        <p class="view"><a href="https://github.com/dechiridas/BitAuth">View the Project on GitHub <small>dechiridas/BitAuth</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/dechiridas/BitAuth/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/dechiridas/BitAuth/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/dechiridas/BitAuth">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>About</h3>
+
+<p>Looking for a simple authentication solution for your Bukkit enabled Minecraft server? Don't want to deal with lots of configuration or daunting commands? Then look no further. This is exactly what BitAuth is all about. It is designed to be run on servers that operate with the <strong>online-mode flag set to false</strong>.</p>
+
+<p>For a list of permission nodes and commands see the included <a href="https://github.com/dechiridas/BitAuth/blob/master/BitAuth/src/plugin.yml">plugin.yml</a> file.</p>
+
+<h3>A word on passwords</h3>
+
+<p>At no point does this plugin <strong>ever</strong> store passwords. This uses a one-way digest algorithm with a variable, private salt. It creates a random salt during registration via Java's SecureRandom. This salt is used to create the password hash and is stored along with the resultant hash. This salt is used to regenerate the same hash when a player is logging in after registration. If the resultant hash matches the stored hash, the password is correct.</p>
+
+<h3>Features</h3>
+
+<ul>
+<li>Player registration and unregistration</li>
+<li>Logging in and out (can be forced by admin)</li>
+<li>Pre-login interaction, chat and command prevention</li>
+<li>30 minute extended login period (only applies to players logging in within this period from the same IP address)</li>
+<li>Login time limit, default is 2 minutes - kicks after this period</li>
+<li>Toggled per-player IP address checking (if enabled, prevents users from logging in from new IP addresses)</li>
+<li>Fully featured whitelist system</li>
+<li>Permission support (currently limited to PEX)</li>
+<li>Automatic database table generation (must be properly connected)</li>
+<li>Password changing by player, password resets by administration</li>
+<li>Players not marked as logged in will not take damage</li>
+<li>Disable login for specific players by jumbling their passwords</li>
+<li>System to prevent name-spoofing for users on their 30 minute extended login period</li>
+<li>Password hash salting and iterations</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/dechiridas">dechiridas</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
