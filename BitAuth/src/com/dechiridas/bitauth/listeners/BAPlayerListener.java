@@ -113,16 +113,6 @@ public class BAPlayerListener implements Listener {
 				event.setCancelled(true);
 	}
 	
-	/*@EventHandler
-	public void onPlayerChat(PlayerChatEvent event) {
-		Player player = event.getPlayer();
-		BAPlayer ba = plugin.pman.getBAPlayerByName(player.getName());
-		BAState state = ba.getState();
-
-		if (state == BAState.UNREGISTERED || state == BAState.LOGGEDOUT)
-			event.setCancelled(true);
-	}*/
-	
 	// PlayerChatEvent deprecated, replaced with AsyncPlayerChatEvent
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event) {

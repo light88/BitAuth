@@ -94,7 +94,7 @@ public class Database {
 						long lastlogintest = (System.currentTimeMillis() / 1000L) - 1800;
 						long lastlogintime = result.getLong(5);
 						long playerIP = result.getLong(6);
-						long currentIP = Utils.ipToLong(event.getAddress().getHostName());
+						long currentIP = Utils.ipToLong(event.getAddress().getHostAddress());
 
 						if (lastlogintime < lastlogintest) {
 							//instance.requireLogin.add(player);
