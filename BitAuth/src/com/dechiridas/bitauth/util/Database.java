@@ -97,20 +97,14 @@ public class Database {
 						long currentIP = Utils.ipToLong(event.getAddress().getHostAddress());
 
 						if (lastlogintime < lastlogintest) {
-							//instance.requireLogin.add(player);
-							//playerLoggedIn = false;
-							
 							ba.setState(BAState.LOGGEDOUT);
 							
 						} else {
 							// Fix to prevent name spoofing from taking advantage
 							// of the 30 minute grace period
-							//System.out.println(currentIP + " ?= " + playerIP);
 							if (currentIP != playerIP) {
 								plugin.log.println("WARNING: Possible name-spoofer detected using name: "
 										+ player.getName());
-								//playerLoggedIn = false;
-								//instance.requireLogin.add(player);
 
 								ba.setState(BAState.LOGGEDOUT);
 							}
@@ -277,17 +271,7 @@ public class Database {
 				// Close statement
 				statement.close();
 
-				// Remove player from unregistered list
-				//int index = 0;
-				//for (Player p : instance.unregistered) {
-				//	if (p.getName().equals(player.getName()))
-				//		index = instance.unregistered.indexOf(p);
-				//}
-				//instance.unregistered.remove(index);
-				ba.setState(BAState.REGISTERED);
-				
-				// Add player to the loggedIn list
-				//instance.loggedIn.add(player);
+				// Set the player state to logged in
 				ba.setState(BAState.LOGGEDIN);
 
 				player.sendMessage(ChatColor.GREEN
@@ -380,17 +364,6 @@ public class Database {
 										
 										// Add player to the logged in list
 										ba.setState(BAState.LOGGEDIN);
-
-										// Remove player from requireLogin list
-										//int index = 0;
-										//for (Player p : instance.requireLogin) {
-										//	if (p.getName().equals(player.getName()))
-										//		index = instance.requireLogin
-										//				.indexOf(p);
-										//}
-										//instance.requireLogin.remove(index);
-										//if (instance.requireLogin.indexOf(player) > 0)
-										//	instance.requireLogin.remove(player);
 									}
 								}
 								else { // Password doesn't match
@@ -398,6 +371,7 @@ public class Database {
 								}
 							}
 						}
+						
 						else if (Utils.byteToString(passwordCheck).equals(
 								Utils.byteToString(hash))) { // Passwords match
 							player.sendMessage(ChatColor.GREEN
@@ -419,17 +393,6 @@ public class Database {
 
 							// Add player to the logged in list
 							ba.setState(BAState.LOGGEDIN);
-
-							// Remove player from requireLogin list
-							//int index = 0;
-							//for (Player p : instance.requireLogin) {
-							//	if (p.getName().equals(player.getName()))
-							//		index = instance.requireLogin
-							//				.indexOf(p);
-							//}
-							//instance.requireLogin.remove(index);
-							//if (instance.requireLogin.indexOf(player) > 0)
-							//	instance.requireLogin.remove(player);
 						} else { // Passwords do not match
 							player.sendMessage(ChatColor.YELLOW
 									+ "Password incorrect, try again.");
@@ -443,6 +406,9 @@ public class Database {
 										+ "If this is an error, contact an admin in IRC." });
 					}
 				}
+			}
+			else if (ba.getState() == BAState.UNREGISTERED) {
+				player.sendMessage(ChatColor.YELLOW + "You have not registered yet.");
 			}
 			else {
 				player.sendMessage(ChatColor.YELLOW + "You are already logged in, silly!");
@@ -479,13 +445,16 @@ public class Database {
 			try {
 				// Create connection
 				Connection conn = DriverManager.getConnection(url, user, pass);
+				
 				// Query to reset last login time to 1
 				String query = "UPDATE `"
 						+ login
 						+ "` SET lastlogintime='1' WHERE username='"
 						+ name + "'";
+				
 				// Create statement object
 				Statement update = conn.createStatement();
+				
 				// Execute update
 				update.executeUpdate(query);
 				
@@ -522,12 +491,15 @@ public class Database {
 			try {
 				// Create connection
 				Connection conn = DriverManager.getConnection(url, user, pass);
+				
 				// Query to reset last login time to 1
 				String query = "UPDATE `" + login
 						+ "` SET lastlogintime='1' WHERE username='"
 						+ name + "'";
+				
 				// Create statement object
 				Statement update = conn.createStatement();
+				
 				// Execute update
 				update.executeUpdate(query);
 
@@ -553,21 +525,15 @@ public class Database {
 		try {
 			// Create connection
 			Connection conn = DriverManager.getConnection(url, user, pass);
+			
 			String query = "DELETE FROM `" + login + "` WHERE username='" + player.getName() + "'";
 			Statement delete = conn.createStatement();
 			delete.executeUpdate(query);
+
+			// Force player to log out
+			plugin.getServer().dispatchCommand(Bukkit.getConsoleSender(), "logout " + player.getName());
 			
-			// Remove player from loggedIn list
-			//int index = 0;
-			//for (Player p : instance.loggedIn) {
-			//	if (p.getName().equals(player.getName()))
-			//		index = instance.loggedIn.indexOf(p);
-			//}
-			//instance.loggedIn.remove(index);
-			ba.setState(BAState.LOGGEDOUT);
-			
-			// Add player to unregistered list
-			//instance.unregistered.add(player);
+			// Set player state to unregistered
 			ba.setState(BAState.UNREGISTERED);
 			
 			// Inform the player that they have been unregistered from the server
@@ -709,6 +675,7 @@ public class Database {
 				try {
 					// Create connection
 					Connection conn = DriverManager.getConnection(url, user, pass);
+					
 					String query = "UPDATE `" + login + "` SET enableipcheck='"
 							+ ipcheckFlagInt + "' WHERE username='"
 							+ player.getName() + "'";
@@ -796,6 +763,7 @@ public class Database {
 				try {
 					// Create connection and exect SELECT query
 					Connection conn = DriverManager.getConnection(url, user, pass);
+					
 					String query = "SELECT * FROM `" + login + "` WHERE `username`='" + username + "'";
 					Statement statement = conn.createStatement();
 					ResultSet result = statement.executeQuery(query);
@@ -854,6 +822,7 @@ public class Database {
 				try {
 					// Create connection and exect SELECT query
 					Connection conn = DriverManager.getConnection(url, user, pass);
+					
 					String query = "SELECT * FROM `" + login + "` WHERE `username`='" + username + "'";
 					Statement statement = conn.createStatement();
 					ResultSet result = statement.executeQuery(query);
