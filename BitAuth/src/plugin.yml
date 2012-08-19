@@ -1,5 +1,5 @@
 name: BitAuth
-version: 1.1
+version: 1.2.1
 description: A lightweight authentication plugin. Uses MySQL.
 author: dechiridas
 website: http://www.dechiridas.com/
