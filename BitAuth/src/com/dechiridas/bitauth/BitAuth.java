@@ -26,7 +26,8 @@ public class BitAuth extends JavaPlugin {
 	public BAPlayerListener playerListener = null;
 	public BABlockListener blockListener = null;
 	public BAEntityListener entityListener = null;
-
+	public BAInventoryListener inventoryListener = null;
+	
 	@Override
 	public void onDisable() {
 		// Clean up
@@ -81,9 +82,11 @@ public class BitAuth extends JavaPlugin {
 		if (playerListener == null) playerListener = new BAPlayerListener(this);
 		if (blockListener == null) blockListener = new BABlockListener(this);
 		if (entityListener == null) entityListener = new BAEntityListener(this);
+		if (inventoryListener == null) inventoryListener = new BAInventoryListener(this);
 		pm.registerEvents(this.playerListener, this);
 		pm.registerEvents(this.blockListener, this);
 		pm.registerEvents(this.entityListener, this);
+		pm.registerEvents(this.inventoryListener, this);
 		
 		// Register commands
 		getCommand("register").setExecutor(new Register(this));

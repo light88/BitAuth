@@ -65,7 +65,7 @@ public class BAPlayerListener implements Listener {
 					ChatColor.GREEN + "/login <password>"
 			});
 	}
-	
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();

@@ -430,7 +430,14 @@ public class Database {
 	
 	public void tryLogout(Player player, String[] input) {
 		// Get target players name
-		String name = input[0];
+		String name = "";
+		
+		// Now defaults to player issueing the command if no given name is found
+		if (input != null && input.length == 1)
+			name = input[0];
+		else if (input == null || input.length == 0)
+			name = player.getName();
+		
 		boolean playerFound = false;
 		
 		// Look for player

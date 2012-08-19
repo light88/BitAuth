@@ -22,11 +22,24 @@ public class Logout implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 			
-			if (plugin.pex.has(player, "bitauth.logout") || player.isOp())
-				plugin.database.tryLogout(player, split);
+			if (plugin.pex.has(player, "bitauth.logout") || 
+					plugin.pex.has(player,  "bitauth.logout.other") || player.isOp()) {
+				String name = "";
+				
+				if (split.length == 1)
+					name = split[0];
+				else
+					name = player.getName();
+				
+				if (name.equals(player.getName()))
+					plugin.database.tryLogout(new String[]{ player.getName() });
+				else
+					if (plugin.pex.has(player, "bitauth.logout.other"))
+						plugin.database.tryLogout(player, split);
+			}
 			else
 				player.sendMessage(ChatColor.YELLOW +
-						"You do not have access to this feature.");
+					"You do not have access to this feature.");
 			
 			r = true;
 		} else {

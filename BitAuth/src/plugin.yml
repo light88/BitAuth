@@ -43,6 +43,7 @@ permissions:
             bitauth.whitelist: true
             bitauth.pwreset: true
             bitauth.logout: true
+            bitauth.logout.other: true
     bitauth.whitelist:
         description: Allows you to modify the whitelist
         default: op
@@ -50,7 +51,10 @@ permissions:
         description: Allows you to reset user passwords
         default: op
     bitauth.logout:
-        description: Allows you to forcefully log a user out
+        description: Allows you to terminate your current session
+        default: op
+    bitauth.logout.other:
+        description: Allows you to forcefully log another user out
         default: op
     bitauth.jumble:
         description: Allows you to jumble user passwords (disable the user more or less)
