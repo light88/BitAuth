@@ -20,8 +20,13 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		boolean whitelisted = plugin.database.isWhitelisted(event.getPlayer());
+		long regdate = plugin.database.getRegistrationDate(event.getPlayer());
+		long now = (long)(Math.floor(System.currentTimeMillis() / 1000));
+		long diff = now - regdate;
 		
-		if (whitelisted == false && plugin.database.whitelistEnabled() == true)
+		// current allowed time difference of 3 days (259.2 kiloseconds)
+		// revisit during configuration overhaul
+		if ((whitelisted == false || diff < 259200) && plugin.database.whitelistEnabled() == true)
 			event.disallow(null, "You are not whitelisted.");
 		
 		else

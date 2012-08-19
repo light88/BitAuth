@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ConcurrentModificationException;
@@ -31,7 +32,7 @@ public class Database {
 	private String url = ""; // db url
 	private String login = ""; // db login table
 	private String wlist = ""; // db whitelist table
-	private boolean whitelist = false;
+	//private boolean whitelist = false;
 	
 	public Database(BitAuth instance) {
 		this.plugin = instance;
@@ -43,11 +44,11 @@ public class Database {
 		url = "jdbc:mysql://" + plugin.config.readString("DB_Host") + 
 				"/" + plugin.config.readString("DB_Name");
 		
-		whitelist = plugin.config.readBoolean("Use_Whitelist");
+		//whitelist = plugin.config.readBoolean("Use_Whitelist");
 	}
 	
 	public boolean whitelistEnabled() {
-		return whitelist;
+		return plugin.config.readBoolean("Use_Whitelist");
 	}
 	
 	public boolean isWhitelisted(Player player) {
@@ -93,7 +94,7 @@ public class Database {
 						playerFound = true;
 						long lastlogintest = (System.currentTimeMillis() / 1000L) - 1800;
 						long lastlogintime = result.getLong(5);
-						long playerIP = result.getLong(6);
+						long playerIP = result.getLong(7);
 						long currentIP = Utils.ipToLong(event.getAddress().getHostAddress());
 
 						if (lastlogintime < lastlogintest) {
@@ -166,9 +167,60 @@ public class Database {
 		if (blogin == true && bwhitelist == true)
 			r = true;
 		
+		// check for changes if tables exist, otherwise ignore
+		if (r == true)
+			checkChanges();
+		
 		return r;
 	}
 	
+	private void checkChanges() {
+		// check for new login table columns
+		try {
+			// new columns
+			String[] newcolumns = { "dateregistered" };
+			boolean[] found = new boolean[newcolumns.length];
+			
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery("SELECT * FROM `" + login + "`");
+			ResultSetMetaData rsmd = result.getMetaData();
+			
+			for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
+				String column = rsmd.getColumnName(i);
+				
+				for (int j = 0; j < newcolumns.length; j++)
+					if (newcolumns[j].equals(column))
+						found[j] = true; // column found
+			}
+			
+			for (int i = 0; i < found.length; i++) {
+				if (found[i] == false) { // column not found
+					String column = newcolumns[i];
+					
+					// date registered column
+					if (column.equals(newcolumns[i])) {
+						plugin.log.println("Adding column " + column + " to table " + login + ".");
+						
+						PreparedStatement ps = conn.prepareStatement(
+							"ALTER TABLE `" + login + "` ADD " +
+							"`" + column + "` BIGINT(20) NOT NULL " +
+							"AFTER `lastlogintime`");
+						ps.executeUpdate();
+						ps.close();
+					}
+				}
+			}
+			
+			// clean up
+			result.close();
+			select.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
+
 	public void generateTables() {
 		String queryDropLogin = "DROP TABLE IF EXISTS `" + login + "`";
 		String queryCreateLogin = "CREATE TABLE `" + login + "` (" +
@@ -177,6 +229,7 @@ public class Database {
 				"`password` blob NOT NULL," +
 				"`whitelist` tinyint(1) NOT NULL," +
 				"`lastlogintime` bigint(20) NOT NULL," +
+				"`dateregistered` bigint(20) NOT NULL," +
 				"`ipaddress` bigint(20) NOT NULL," +
 				"`enableipcheck` tinyint(1) NOT NULL," +
 				"`pwreset` tinyint(4) NOT NULL," +
@@ -246,24 +299,42 @@ public class Database {
 				// Set up the query
 				String query = "INSERT INTO `" + login + "` "
 						+ "(`username`, `salt`, `password`, `whitelist`, "
-						+ "`lastlogintime`, `ipaddress`, `enableipcheck`, "
-						+ "`pwreset`, `temppwd`, `tmpsalt`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+						+ "`lastlogintime`, `dateregistered`, `ipaddress`, `enableipcheck`, "
+						+ "`pwreset`, `temppwd`, `tmpsalt`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 				PreparedStatement statement = conn.prepareStatement(query);
 
-				// Set query values; 1 = user, 2 = salt, 3 = password hash,
-				// 4 = white list T/F, 5 = last login time, 6 = player ip,
-				// 7 = enable ip checking, 8 = pwreset T/F, 9 = temp pw,
-				// 10 = temp salt
+				// player name
 				statement.setString(1, player.getName());
+				
+				// password salt
 				statement.setBytes(2, salt);
+				
+				// hashed password
 				statement.setBytes(3, hash);
+				
+				// whitelisted - not used
 				statement.setBoolean(4, true);
+				
+				// last login time - now
 				statement.setLong(5, unixtime);
-				statement.setLong(6, playerIP);
-				statement.setBoolean(7, false);
+				
+				// date registered - now
+				statement.setLong(6, unixtime);
+				
+				// ip address
+				statement.setLong(7, playerIP);
+				
+				// enable ip checking
 				statement.setBoolean(8, false);
-				statement.setBytes(9, null);
+				
+				// password reset (y/n)
+				statement.setBoolean(9, false);
+				
+				// temp password hash
 				statement.setBytes(10, null);
+				
+				// temp salt
+				statement.setBytes(11, null);
 
 				// Execute the query
 				statement.executeUpdate();
@@ -306,9 +377,9 @@ public class Database {
 					byte[] salt = result.getBytes(2);
 					byte[] hash = result.getBytes(3);
 					byte[] passwordCheck = HashManager.GenerateHash(input[0], salt);
-					boolean pwreset = result.getInt(8) == 1 ? true : false;
-					long playerIP = result.getLong(6);
-					boolean checkIP = result.getBoolean(7);
+					boolean pwreset = result.getInt(9) == 1 ? true : false;
+					long playerIP = result.getLong(7);
+					boolean checkIP = result.getBoolean(8);
 					
 					// Get player IP
 					InetAddress iAddress = player.getAddress().getAddress();
@@ -317,8 +388,8 @@ public class Database {
 					// Check player IP if necessary
 					if ((!checkIP) || (checkIP && playerIP == currentIP)) { // IP addresses match
 						if (pwreset == true) {
-							hash = result.getBytes(9);
-							salt = result.getBytes(10);
+							hash = result.getBytes(10);
+							salt = result.getBytes(11);
 							passwordCheck = HashManager.GenerateHash(input[0], salt);
 							
 							if (input.length == 1) { // They didn't include the new password or don't know their password has been reset
@@ -988,5 +1059,27 @@ public class Database {
 				}
 			}
 		}
+	}
+
+	public long getRegistrationDate(Player player) {
+		String name = player.getName();
+		long regdate = -1;
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery(
+					"SELECT `dateregistered` FROM `" + login + "` WHERE `username`='" + name + "'");
+			
+			if (result.next()) { // player found
+				do {
+					regdate = result.getLong(1);
+				} while (result.next());
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		
+		return regdate;
 	}
 }
