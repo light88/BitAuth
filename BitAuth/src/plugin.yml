@@ -23,7 +23,7 @@ commands:
         usage: /whitelist <add/del> <username>
     logout:
         description: Terminate your current session, requires the user to log back in to play
-        usage: /logout <username>
+        usage: /logout [username]
     unregister:
         description: Can be used to unregister your account or by an administrator to remove the account of another user
         usage: /unregister [username]
@@ -36,6 +36,10 @@ commands:
     baversion:
         description: Retrieve the version number of BitAuth
         usage: /baversion
+    iphistory:
+        description: Retrieve the last 5 unique IP addresses associated with a user
+        usage: /iphistory <user>
+        aliases: [history, ips]
 permissions:
     bitauth.*:
         description: Gives access to all BitAuth features
@@ -58,4 +62,10 @@ permissions:
         default: op
     bitauth.jumble:
         description: Allows you to jumble user passwords (disable the user more or less)
+        default: op
+    bitauth.iphistory.self:
+        description: Allows you to check your own IP history
+        default: op
+    bitauth.iphistory.other:
+        description: Allows you to check the IP history of another user
         default: op

@@ -15,7 +15,7 @@ public class BAPlayer {
 		this.plugin = instance;
 		this.player = player;
 		this.tt = new TimeoutTimer();
-		this.timeout = Integer.parseInt(plugin.config.readString("Login_Time_Limit"));
+		this.timeout = Integer.parseInt(plugin.config.getString("settings.timeout"));
 		this.state = BAState.LOGGEDOUT;
 		
 		tt.start();

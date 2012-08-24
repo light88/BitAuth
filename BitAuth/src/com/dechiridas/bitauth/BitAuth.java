@@ -1,5 +1,6 @@
 package com.dechiridas.bitauth;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +18,7 @@ import com.dechiridas.bitauth.util.*;
 public class BitAuth extends JavaPlugin {
 	// public objects
 	public Log log = null;
-	public Config config = null;
+	public FileConfiguration config = null;
 	public PlayerManager pman = null;
 	public Database database = null;
 	public PermissionManager pex = null;
@@ -41,31 +42,33 @@ public class BitAuth extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		// Initialize
+		
+		// Create plugin configuration directory if it doesn't exist
+		if (!this.getDataFolder().exists())
+			this.getDataFolder().mkdir();
+		config = this.getConfig();
+		
+		// Create default config if it doesn't exist
+		this.getConfig().options().copyDefaults(true);
+		this.saveConfig();
+		
 		if (log == null) log = new Log(this);
-		if (config == null) config = new Config(this);
 		if (pman == null) pman = new PlayerManager(this);
 		if (database == null) database = new Database(this);
+		
+		// Check databases, generate if not found
+		// will give errors if config isn't set up properly
+		if (database.tablesExist() == false)
+			log.println("Generating missing tables...");
 		 
 		// Get permission manager
 		pex = PermissionsEx.getPermissionManager();
-		
-		// Check if config.yml was modified
-		if (!config.readString("DB_Host").equals("hostipaddress")) {
-			if (database.tablesExist() != true) { // Check if tables exist
-				log.println("Generating tables `"
-						+ config.readString("DB_Table_login") + "` and `"
-						+ config.readString("DB_Table_whitelist") + "`");
-				database.generateTables();
-			} else {
-				log.println("Database and tables found.");
-			}
-		}
 		
 		// Create variables
 		PluginManager pm = getServer().getPluginManager();
 		
 		// Check if whitelist is enabled
-		if (config.readBoolean("Use_Whitelist") == true)
+		if (database.whitelistEnabled() == true)
 			log.println("Starting with whitelist enabled");
 		else
 			log.println("Starting with whitelist disabled");
@@ -99,5 +102,6 @@ public class BitAuth extends JavaPlugin {
 		getCommand("pwreset").setExecutor(new Pwreset(this));
 		getCommand("jumblepw").setExecutor(new Jumblepw(this));
 		getCommand("baversion").setExecutor(new Baversion(this));
+		getCommand("iphistory").setExecutor(new Iphistory(this));
 	}
 }

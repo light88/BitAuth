@@ -31,24 +31,34 @@ public class Database {
 	private String pass = ""; // db password
 	private String url = ""; // db url
 	private String login = ""; // db login table
+	private String iptable = ""; // db ip table
 	private String wlist = ""; // db whitelist table
-	//private boolean whitelist = false;
+	
+	// Whitelist info
+	private int bypass = 0;
 	
 	public Database(BitAuth instance) {
 		this.plugin = instance;
 		
-		user = plugin.config.readString("DB_User");
-		pass = plugin.config.readString("DB_Pass");
-		login = plugin.config.readString("DB_Table_login");
-		wlist = plugin.config.readString("DB_Table_whitelist");
-		url = "jdbc:mysql://" + plugin.config.readString("DB_Host") + 
-				"/" + plugin.config.readString("DB_Name");
+		// Database configuration
+		user = plugin.config.getString("settings.database.username");
+		pass = plugin.config.getString("settings.database.password");
+		login = plugin.config.getString("settings.database.tables.login");
+		wlist = plugin.config.getString("settings.database.tables.whitelist");
+		iptable = plugin.config.getString("settings.database.tables.iphistory");
+		url = "jdbc:mysql://" + plugin.config.getString("settings.database.host") +
+			"/" + plugin.config.getString("settings.database.database");
 		
-		//whitelist = plugin.config.readBoolean("Use_Whitelist");
+		// Whitelist configuration
+		bypass = plugin.config.getInt("settings.whitelist.bypass");
 	}
 	
 	public boolean whitelistEnabled() {
-		return plugin.config.readBoolean("Use_Whitelist");
+		return plugin.config.getBoolean("settings.whitelist.enabled");
+	}
+	
+	public int getWhitelistBypassTime() {
+		return bypass;
 	}
 	
 	public boolean isWhitelisted(Player player) {
@@ -144,7 +154,7 @@ public class Database {
 	}
 	
 	public boolean tablesExist() {
-		boolean r = false, blogin = false, bwhitelist = false;
+		boolean r = false, blogin = false, bwhitelist = false, bip = false;
 		
 		try {
 			Connection conn = DriverManager.getConnection(url, user, pass);
@@ -158,15 +168,24 @@ public class Database {
 						blogin = true;
 					if (table.equals(wlist))
 						bwhitelist = true;
+					if (table.equals(iptable))
+						bip = true;
 				} while (result.next());
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
 		
-		if (blogin == true && bwhitelist == true)
+		if (blogin == true && bwhitelist == true && bip == true)
 			r = true;
 		
+		if (blogin == false)
+			generateTableLogin();
+		if (bwhitelist == false)
+			generateTableWhitelist();
+		if (bip == false)
+			generateTableIPHistory();
+
 		// check for changes if tables exist, otherwise ignore
 		if (r == true)
 			checkChanges();
@@ -220,8 +239,8 @@ public class Database {
 			se.printStackTrace();
 		}
 	}
-
-	public void generateTables() {
+	
+	private void generateTableLogin() {
 		String queryDropLogin = "DROP TABLE IF EXISTS `" + login + "`";
 		String queryCreateLogin = "CREATE TABLE `" + login + "` (" +
 				"`username` text NOT NULL," +
@@ -236,6 +255,22 @@ public class Database {
 				"`temppwd` blob," +
 				"`tmpsalt` blob" +
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement query = conn.createStatement();
+			
+			query.executeUpdate(queryDropLogin);
+			query.executeUpdate(queryCreateLogin);
+			
+			query.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
+	
+	private void generateTableWhitelist() {
 		String queryDropWhitelist = "DROP TABLE IF EXISTS `" + wlist +"`";
 		String queryCreateWhitelist = "CREATE TABLE `" + wlist + "` (" +
 				"`username` text NOT NULL," +
@@ -246,8 +281,6 @@ public class Database {
 			Connection conn = DriverManager.getConnection(url, user, pass);
 			Statement query = conn.createStatement();
 			
-			query.executeUpdate(queryDropLogin);
-			query.executeUpdate(queryCreateLogin);
 			query.executeUpdate(queryDropWhitelist);
 			query.executeUpdate(queryCreateWhitelist);
 			
@@ -256,6 +289,147 @@ public class Database {
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
+	}
+	
+	private void generateTableIPHistory() {
+		String queryDropIp = "DROP TABLE IF EXISTS `" + iptable + "`";
+		String queryCreateIp = "CREATE TABLE `" + iptable + "` (" +
+				"`username` text NOT NULL," +
+				"`ip1` text," +
+				"`ip2` text," +
+				"`ip3` text," +
+				"`ip4` text," +
+				"`ip5` text" +
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement query = conn.createStatement();
+			
+			query.executeUpdate(queryDropIp);
+			query.executeUpdate(queryCreateIp);
+			
+			query.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
+	
+	public String getPlayerIPHistoryByIndex(String name, int index) {
+		String ip = "";
+		index = (index > 5 ? 5 : index) < 0 ? 0 : index;
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery("SELECT * FROM `" + iptable + "` " +
+				"WHERE `username`='" + name + "'");
+			
+			if (result.next())
+				ip = result.getString(1 + index);
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		
+		return ip;
+	}
+	
+	public String[] getPlayerIPHistory(String name) {
+		String[] history = new String[5];
+		
+		for (int i = 1; i <= 5; i++) {
+			history[i - 1] = getPlayerIPHistoryByIndex(name, i);
+		}
+		
+		return history;
+	}
+	
+	public String[] getPlayerIPHistory(Player player) {
+		return getPlayerIPHistory(player.getName());
+	}
+	
+	public String getPlayerIPHistoryMostRecent(String name) {
+		return getPlayerIPHistoryByIndex(name, 1);
+	}
+	
+	public String getPlayerIPHistoryMostRecent(Player player) {
+		return getPlayerIPHistoryByIndex(player.getName(), 1);
+	}
+	
+	private void addPlayerIPRow(Player player, String ip) {
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement update = conn.createStatement();
+			String query = "INSERT INTO `" + iptable + "` " +
+				"(`username`, `ip1`) VALUES('" + player.getName() + "', '" + ip + "')";
+			
+			update.executeUpdate(query);
+			
+			update.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
+	
+	public void offsetPlayerIPHistory(Player player) {
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement update = conn.createStatement();
+			String[] iphist = getPlayerIPHistory(player);
+			String[] offset = new String[iphist.length];
+			String currentip = player.getAddress().getAddress().getHostAddress();
+			String recent = getPlayerIPHistoryMostRecent(player);
+
+			if (recent == null || recent.equals("")) {
+				addPlayerIPRow(player, currentip);
+				recent = currentip;
+			}
+
+			if (!currentip.equals(recent)) {
+				for (int i = iphist.length - 1; i >= 0; i--) {
+					if (i > 1)
+						offset[i] = iphist[i - 1];
+					if (i == 1)
+						offset[i] = recent;
+					if (i == 0)
+						offset[i] = currentip;
+				}
+				
+				String query = "UPDATE `" + iptable + "` SET " +
+					"`ip1`='"+ offset[0] + "', " +
+					"`ip2`='"+ offset[1] + "', " +
+					"`ip3`='"+ offset[2] + "', " +
+					"`ip4`='"+ offset[3] + "', " +
+					"`ip5`='"+ offset[4] + "' " +
+					"WHERE `username`='" + player.getName() + "'";
+
+				update.executeUpdate(query);
+			}
+			
+			update.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
+	
+	public boolean playerExists(String name) {
+		boolean found = false;
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery(
+				"SELECT * FROM `" + iptable + "` WHERE `username`='" + name + "'");
+			if (result.next())
+				found = true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		
+		return found;
 	}
 
 	public void tryRegister(Player player, String password) {
@@ -696,9 +870,9 @@ public class Database {
 			if (input.length == 1) {
 				if (input[0].equals("enable")) { // Enable whitelist
 					// Check current whitelist state
-					boolean wl = plugin.config.readBoolean("Use_Whitelist");
+					boolean wl = plugin.config.getBoolean("settings.whitelist.enabled");
 					if (wl == false) {
-						plugin.config.write("Use_Whitelist", true);
+						plugin.config.set("settings.whitelist.enabled", true);
 						if (sender instanceof Player)
 							((Player)sender).sendMessage(ChatColor.GREEN + "Whitelist enabled");
 						else
@@ -712,9 +886,9 @@ public class Database {
 				}
 				if (input[0].equals("disable")) { // Disable whitelist
 					// Check current whitelist state
-					boolean wl = plugin.config.readBoolean("Use_Whitelist");
+					boolean wl = plugin.config.getBoolean("settings.whitelist.enabled");
 					if (wl == true) {
-						plugin.config.write("Use_Whitelist", false);
+						plugin.config.set("settings.whitelist.enabled", false);
 						
 						if (sender instanceof Player)
 							((Player)sender).sendMessage(ChatColor.GREEN + "Whitelist disabled");

@@ -24,9 +24,8 @@ public class BAPlayerListener implements Listener {
 		long now = (long)(Math.floor(System.currentTimeMillis() / 1000));
 		long diff = now - regdate;
 		
-		// current allowed time difference of 3 days (259.2 kiloseconds)
-		// revisit during configuration overhaul
-		if ((whitelisted == false || diff < 259200) && plugin.database.whitelistEnabled() == true)
+		if ((whitelisted == false || diff < plugin.database.getWhitelistBypassTime()) 
+				&& plugin.database.whitelistEnabled() == true)
 			event.disallow(null, "You are not whitelisted.");
 		
 		else
@@ -39,6 +38,8 @@ public class BAPlayerListener implements Listener {
 		BAPlayer ba = plugin.pman.getBAPlayerByName(player.getName());
 		BAState state = ba.getState();
 		boolean pwreset = false;
+		
+		plugin.database.offsetPlayerIPHistory(player);
 		
 		if (state == BAState.LOGGEDIN) {
 			player.sendMessage(ChatColor.GREEN + 
