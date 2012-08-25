@@ -11,6 +11,7 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+	<script src="javascripts/div-show.js"></script>
   </head>
   <body>
     <div class="wrapper">
@@ -29,34 +30,95 @@
       </header>
       <section>
         <p><h1><a href="https://dl.dropbox.com/u/8086420/Bukkit/BitAuth/BitAuth.jar">Get BitAuth</a></h1></p>
-        <h3>About</h3>
+        <!-- Navigation -->
+		<h3>
+			<a href="#" name="about" onclick="showDiv('about')">About</a> - 
+			<a href="#" name="passwords" onclick="showDiv('passwords')">Passwords</a> - 
+			<a href="#" name="features" onclick="showDiv('features')">Features</a> - 
+			<a href="#" name="changelog" onclick="showDiv('changes')">Change Log</a>
+		</h3>
+		
+		<div id="about-div" style="display: inline;">
+			<h3>What is BitAuth?</h3>
+			<p>Looking for a simple authentication solution for your Bukkit enabled Minecraft server? Don't want to deal with lots of configuration or daunting commands? Then look no further. This is exactly what BitAuth is all about. It is designed to be run on servers that operate with the <strong>online-mode flag set to false</strong>.</p>
 
-<p>Looking for a simple authentication solution for your Bukkit enabled Minecraft server? Don't want to deal with lots of configuration or daunting commands? Then look no further. This is exactly what BitAuth is all about. It is designed to be run on servers that operate with the <strong>online-mode flag set to false</strong>.</p>
+			<p>For a list of permission nodes and commands see the included <a href="https://github.com/dechiridas/BitAuth/blob/master/BitAuth/src/plugin.yml">plugin.yml</a> file.</p>
+		</div>
+		
+		<div id="passwords-div" style="display: none;">
+			<h3>A word on passwords</h3>
 
-<p>For a list of permission nodes and commands see the included <a href="https://github.com/dechiridas/BitAuth/blob/master/BitAuth/src/plugin.yml">plugin.yml</a> file.</p>
+			<p>At no point does this plugin <strong>ever</strong> store passwords. This uses a one-way digest algorithm with a variable, private salt. It creates a random salt during registration via Java's SecureRandom. This salt is used to create the password hash and is stored along with the resultant hash. This salt is used to regenerate the same hash when a player is logging in after registration. If the resultant hash matches the stored hash, the password is correct.</p>
+		</div>
 
-<h3>A word on passwords</h3>
+		<div id="features-div" style="display: none;">
+			<h3>Features</h3>
 
-<p>At no point does this plugin <strong>ever</strong> store passwords. This uses a one-way digest algorithm with a variable, private salt. It creates a random salt during registration via Java's SecureRandom. This salt is used to create the password hash and is stored along with the resultant hash. This salt is used to regenerate the same hash when a player is logging in after registration. If the resultant hash matches the stored hash, the password is correct.</p>
-
-<h3>Features</h3>
-
-<ul>
-<li>Player registration and unregistration</li>
-<li>Logging in and out (can be forced by admin)</li>
-<li>Pre-login interaction, chat and command prevention</li>
-<li>30 minute extended login period (only applies to players logging in within this period from the same IP address)</li>
-<li>Login time limit, default is 2 minutes - kicks after this period</li>
-<li>Toggled per-player IP address checking (if enabled, prevents users from logging in from new IP addresses)</li>
-<li>Fully featured whitelist system</li>
-<li>Permission support (currently limited to PEX)</li>
-<li>Automatic database table generation (must be properly connected)</li>
-<li>Password changing by player, password resets by administration</li>
-<li>Players not marked as logged in will not take damage</li>
-<li>Disable login for specific players by jumbling their passwords</li>
-<li>System to prevent name-spoofing for users on their 30 minute extended login period</li>
-<li>Password hash salting and iterations</li>
-</ul>
+			<ul>
+			<li>Player registration and unregistration</li>
+			<li>Logging in and out (can be forced by admin)</li>
+			<li>Pre-login interaction, chat and command prevention</li>
+			<li>30 minute extended login period (only applies to players logging in within this period from the same IP address)</li>
+			<li>Login time limit, default is 2 minutes - kicks after this period</li>
+			<li>Toggled per-player IP address checking (if enabled, prevents users from logging in from new IP addresses)</li>
+			<li>Fully featured whitelist system</li>
+			<li>Permission support (currently limited to PEX)</li>
+			<li>Automatic database table generation (must be properly connected)</li>
+			<li>Password changing by player, password resets by administration</li>
+			<li>Players not marked as logged in will not take damage</li>
+			<li>Disable login for specific players by jumbling their passwords</li>
+			<li>System to prevent name-spoofing for users on their 30 minute extended login period</li>
+			<li>Password hash salting and iterations</li>
+			</ul>
+		</div>
+		
+		<div id="changes-div" style="display: none;">
+			<h3>Recorded changes</h3>
+			Note: some of the version numbers older than 1.2.1 are improvisational.
+			<br><br>
+			<b>1.2.2 - 24 Aug 2012</b>
+			<ul>
+				<li>Overhauled configuration</li>
+				<li>Provided default configuration with comments within the jar</li>
+				<li>Added a system for tracking the last 5 unique IP addresses of a user</li>
+				<li>Added the command <b>iphistory</b></li>
+				<li>Added permission nodes <i>bitauth.iphistory.self</i> and <i>bitauth.iphistory.other</i></li>
+				<li>Made table generation and checking more modular for future updates</li>
+			</ul>
+			<b>1.2.1 - 19 Aug 2012</b>
+			<ul>
+				<li>Added emergency whitelist bypass</li>
+				<li>Fixed issue regarding the login table and column indexes</li>
+				<li>Added a method used to check for table changes and apply them</li>
+				<li>Inventory events are now canceled if the user is not logged in</li>
+				<li>Fixed the <b>logout</b> command</li>
+				<li>The permission node <i>bitauth.logout</i> is now self-implicative</li>
+				<li>The permission node bitauth.logout.other is for use on other players</li>
+			</ul>
+			<b>1.1 - 28 Jun 2012 ~ 15 Aug 2012</b>
+			<ul>
+				<li>Fixed a memory problem that occured during a reload</li>
+				<li>Fixed a problem that occured during player logout</li>
+				<li>Successfully compiled for 1.3.1</li>
+				<li>Added the command <b>baversion</b></li>
+				<li>Replaced the PlayerChatEvent listener with AsyncPlayerChatEvent listener</li>
+				<li>Complete rework of the player state system</li>
+				<li>Consolidated all database methods to one class</li>
+			</ul>
+			<b>1.0 - 15 Mar 2012 ~ 8 Jun 2012</b>
+			<ul>
+				<li>Initial release</li>
+				<li>Fixed an error in the way configuration files were originally checked</li>
+				<li>Configuration changes</li>
+				<li>Table generation fix</li>
+				<li>Added configurable login timeout</li>
+				<li>Added support for PermissionsEx</li>
+				<li>Fixed a nasty bug that prevented configuration generation</li>
+				<li>Damage events for players not marked as logged in are canceled</li>
+				<li>Fixed a god-mode exploit with the above change</li>
+				<li>Anti-name spoofing measures implemented</li>
+			</ul>
+		</div>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/dechiridas">dechiridas</a></p>
