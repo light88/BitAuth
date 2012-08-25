@@ -2,7 +2,7 @@ name: BitAuth
 version: 1.2.2
 description: A lightweight authentication plugin. Uses MySQL.
 author: dechiridas
-website: http://www.dechiridas.com/
+website: http://dechiridas.github.com/BitAuth
 depend: [PermissionsEx]
 main: com.dechiridas.bitauth.BitAuth
 commands:
