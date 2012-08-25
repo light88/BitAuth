@@ -9,6 +9,7 @@ import org.bukkit.event.player.*;
 import com.dechiridas.bitauth.BitAuth;
 import com.dechiridas.bitauth.player.BAPlayer;
 import com.dechiridas.bitauth.player.BAState;
+import com.dechiridas.bitauth.util.Utils;
 
 public class BAPlayerListener implements Listener {
 	private BitAuth plugin;
@@ -38,7 +39,7 @@ public class BAPlayerListener implements Listener {
 		BAPlayer ba = plugin.pman.getBAPlayerByName(player.getName());
 		BAState state = ba.getState();
 		boolean pwreset = false;
-		
+
 		plugin.database.offsetPlayerIPHistory(player);
 		
 		if (state == BAState.LOGGEDIN) {

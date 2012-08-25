@@ -1,5 +1,11 @@
 package com.dechiridas.bitauth.util;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+
+import org.bukkit.entity.Player;
+
 public class Utils {
 	public static String byteToString(byte[] input) {
 		StringBuilder sb = new StringBuilder();
@@ -20,5 +26,23 @@ public class Utils {
 	
 	public static long unixTimestamp() {
 		return System.currentTimeMillis() / 1000L;
+	}
+	
+	public static boolean isPlayerPremium(Player player) {
+		return isPlayerPremium(player.getName());
+	}
+	
+	public static boolean isPlayerPremium(String name) {
+		boolean premium = false;
+		
+		try {
+			URL url = new URL("http://www.minecraft.net/haspaid.jsp?user=" + name);
+			String str = new BufferedReader(new InputStreamReader(url.openStream())).readLine().toUpperCase();
+			premium = Boolean.valueOf(str);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return premium;
 	}
 }
