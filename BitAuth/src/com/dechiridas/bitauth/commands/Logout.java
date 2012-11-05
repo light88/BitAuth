@@ -43,8 +43,11 @@ public class Logout implements CommandExecutor {
 			
 			r = true;
 		} else {
-			plugin.database.tryLogoutFromConsole(split);
-			
+			if (split.length == 1)
+				plugin.database.tryLogoutFromConsole(split);
+			else
+				plugin.log.println("This command requires an argument when sent from the console.");
+
 			r = true;
 		}
 		
