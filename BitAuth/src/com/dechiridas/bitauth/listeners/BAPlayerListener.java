@@ -9,7 +9,6 @@ import org.bukkit.event.player.*;
 import com.dechiridas.bitauth.BitAuth;
 import com.dechiridas.bitauth.player.BAPlayer;
 import com.dechiridas.bitauth.player.BAState;
-import com.dechiridas.bitauth.util.Utils;
 
 public class BAPlayerListener implements Listener {
 	private BitAuth plugin;
