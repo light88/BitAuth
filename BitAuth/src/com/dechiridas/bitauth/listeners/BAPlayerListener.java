@@ -35,8 +35,35 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		BAPlayer ba = plugin.pman.getBAPlayerByName(player.getName());
-		BAState state = ba.getState();
+		BAPlayer ba = null;
+		BAState state = null;
+		long timeout = System.nanoTime();
+		
+		/* Some debug: could it be that onPlayerJoin fires before onPlayerLogin is
+		 * finished sometimes? I left some debug code in PlayerManager.java to
+		 * try to pin down the problem.
+		 */
+		while (true) {
+			ba = plugin.pman.getBAPlayerByName(player.getName());
+			
+			if (ba == null) {
+				try {
+					Thread.sleep(100L);
+				} catch (InterruptedException e) {}
+			} else {
+				break;
+			}
+			
+			// Exits the loop if it takes more than 2 seconds.
+			if (timeout >= timeout + 2000000) {
+				player.kickPlayer("Something went wrong with authentication. Please relog.");
+				plugin.log.println(ChatColor.stripColor(player.getDisplayName()) + " was kicked because BitAuth fucked up.");
+				break;
+			}
+		}
+		
+		state = ba.getState();
+		
 		boolean pwreset = false;
 
 		plugin.database.offsetPlayerIPHistory(player);
@@ -85,7 +112,8 @@ public class BAPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		BAPlayer ba = plugin.pman.getBAPlayerByName(player.getName());
+		BAPlayer ba = null;
+		ba = plugin.pman.getBAPlayerByName(player.getName());
 
 		plugin.pman.removePlayer(ba);
 	}

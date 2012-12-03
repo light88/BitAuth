@@ -6,7 +6,7 @@ import java.util.List;
 import com.dechiridas.bitauth.BitAuth;
 
 public class PlayerManager {
-	@SuppressWarnings("unused")
+	// @SuppressWarnings("unused")
 	private BitAuth plugin;
 	private List<BAPlayer> players;
 	
@@ -55,12 +55,25 @@ public class PlayerManager {
 	
 	public BAPlayer getBAPlayerByName(String name) {
 		BAPlayer player = null;
+		StringBuilder playerList = new StringBuilder();
 		
 		synchronized(players) {
 			for (BAPlayer p : players) {
 				if (p.getPlayer().getName().equals(name))
 					player = p;
+				playerList.append(p.getPlayer().getName()).append(", ");
 			}
+		}
+		
+		/* I'm trying to track down why this method returns null sometimes,
+		 * but it's a pretty rare issue that tends to only happen once
+		 * every few days, so I'm leaving this here for now.
+		 */
+		if (player == null) {
+			plugin.log.println("###### BITAUTH DEBUG ######");
+			plugin.log.println("Player name is: " + name);
+			plugin.log.println("Checked player list: " + playerList);
+			plugin.log.println("###### END BITAUTH DEBUG ######");
 		}
 		
 		return player;

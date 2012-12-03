@@ -1,12 +1,12 @@
 package com.dechiridas.bitauth;
 
+import java.util.logging.Logger;
+
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import ru.tehkode.permissions.PermissionManager;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import com.dechiridas.bitauth.commands.*;
 import com.dechiridas.bitauth.listeners.*;
@@ -21,14 +21,12 @@ public class BitAuth extends JavaPlugin {
 	public FileConfiguration config = null;
 	public PlayerManager pman = null;
 	public Database database = null;
-	public PermissionManager pex = null;
 	
 	// public listeners
 	public BAPlayerListener playerListener = null;
 	public BABlockListener blockListener = null;
 	public BAEntityListener entityListener = null;
 	public BAInventoryListener inventoryListener = null;
-	public BACommandListener commandListener = null;
 	
 	@Override
 	public void onDisable() {
@@ -61,10 +59,7 @@ public class BitAuth extends JavaPlugin {
 		// will give errors if config isn't set up properly
 		if (database.tablesExist() == false)
 			log.println("Generating missing tables...");
-		 
-		// Get permission manager
-		pex = PermissionsEx.getPermissionManager();
-		
+		 	
 		// Create variables
 		PluginManager pm = getServer().getPluginManager();
 		
@@ -87,12 +82,10 @@ public class BitAuth extends JavaPlugin {
 		if (blockListener == null) blockListener = new BABlockListener(this);
 		if (entityListener == null) entityListener = new BAEntityListener(this);
 		if (inventoryListener == null) inventoryListener = new BAInventoryListener(this);
-		if (commandListener == null) commandListener = new BACommandListener(this);
 		pm.registerEvents(this.playerListener, this);
 		pm.registerEvents(this.blockListener, this);
 		pm.registerEvents(this.entityListener, this);
 		pm.registerEvents(this.inventoryListener, this);
-		pm.registerEvents(this.commandListener, this);
 		
 		// Register commands
 		getCommand("register").setExecutor(new Register(this));
@@ -101,10 +94,21 @@ public class BitAuth extends JavaPlugin {
 		getCommand("whitelist").setExecutor(new Whitelist(this));
 		getCommand("logout").setExecutor(new Logout(this));
 		getCommand("unregister").setExecutor(new Unregister(this));
-		getCommand("chpasswd").setExecutor(new Chpasswd(this));
-		getCommand("pwreset").setExecutor(new Pwreset(this));
+		getCommand("changepw").setExecutor(new Changepw(this));
+		getCommand("resetpw").setExecutor(new Resetpw(this));
 		getCommand("jumblepw").setExecutor(new Jumblepw(this));
-		getCommand("baversion").setExecutor(new Baversion(this));
 		getCommand("iphistory").setExecutor(new Iphistory(this));
+		
+		// Make permission messages in plugin.yml red, since it cannot be done from plugin.yml directly
+		String[] colorCommands = {"register", "login", "ipcheck", "whitelist", "logout",
+				"unregister", "changepw", "resetpw", "jumblepw", "iphistory"};
+		for (String i : colorCommands) {
+			String permMessage = getCommand(i).getPermissionMessage();
+			getCommand(i).setPermissionMessage(ChatColor.RED + permMessage);
+		}
+		
+		//Register filter
+		Logger bukkitLogger = Logger.getLogger("Minecraft");
+		bukkitLogger.setFilter(new PasswordFilter());
 	}
 }

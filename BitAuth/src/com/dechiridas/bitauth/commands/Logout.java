@@ -1,5 +1,6 @@
 package com.dechiridas.bitauth.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,35 +21,34 @@ public class Logout implements CommandExecutor {
 		boolean r = false;
 		
 		if (sender instanceof Player) {
-			Player player = (Player)sender;
-			
-			if (plugin.pex.has(player, "bitauth.logout") || 
-					plugin.pex.has(player,  "bitauth.logout.other") || player.isOp()) {
-				String name = "";
+			if (split.length == 0) {
+				plugin.database.tryLogout(sender, sender.getName());
 				
-				if (split.length == 1)
-					name = split[0];
+				r = true;
+			} else if (split.length == 1) {
+				if (sender.hasPermission("bitauth.logout.other")) {
+					if (Bukkit.getServer().getPlayer(split[0]) != null)
+						plugin.database.tryLogout(sender, split[0]);
+					else
+						sender.sendMessage(ChatColor.YELLOW + "Player \"" + split[0] + "\" could not be found.");
+
+					r = true;
+				} else {
+					sender.sendMessage(ChatColor.RED + 
+							"You do not have access /logout <username>.");
+				}
+			}
+		} else {
+			if (split.length == 1) {
+				if (Bukkit.getServer().getPlayer(split[0]) != null)
+					plugin.database.tryLogout(sender, split[0]);
 				else
-					name = player.getName();
-				
-				if (name.equals(player.getName()))
-					plugin.database.tryLogout(new String[]{ player.getName() });
-				else
-					if (plugin.pex.has(player, "bitauth.logout.other"))
-						plugin.database.tryLogout(player, split);
+					sender.sendMessage("Player \"" + split[0] + "\" could not be found.");
+
+				r = true;
 			}
 			else
-				player.sendMessage(ChatColor.YELLOW +
-					"You do not have access to this feature.");
-			
-			r = true;
-		} else {
-			if (split.length == 1)
-				plugin.database.tryLogoutFromConsole(split);
-			else
 				plugin.log.println("This command requires an argument when sent from the console.");
-
-			r = true;
 		}
 		
 		return r;

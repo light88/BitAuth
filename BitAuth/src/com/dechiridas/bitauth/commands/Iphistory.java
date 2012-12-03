@@ -23,41 +23,32 @@ public class Iphistory implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
 			
-			if (plugin.pex.has(player, "bitauth.iphistory.self") 
-					|| plugin.pex.has(player, "bitauth.iphistory.other") 
-					|| player.isOp()) {
-				String target = "";
-				
-				if (split.length == 1)
-					if (plugin.pex.has(player, "bitauth.iphistory.other") || player.isOp()) {
-						target = split[0];
-				}
-				
-				if (split.length == 0) {
-					if (plugin.pex.has(player, "bitauth.iphistory.self") || player.isOp()) {
-						target = player.getName();
-					}
-				}
-				
-				if (!target.equals("")) {
-					if (plugin.database.playerExists(target)) {
-						String[] history = plugin.database.getPlayerIPHistory(
-								plugin.getServer().getPlayer(target));
-						player.sendMessage(new String[] {
-								ChatColor.YELLOW + "The most recent IP addresses for " + ChatColor.GREEN + target + ChatColor.YELLOW + ":",
-								(history[0] != null ? ChatColor.GREEN + history[0] : "") +
-								(history[1] != null ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[1] : "") +
-								(history[2] != null ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[2] : "") +
-								(history[3] != null ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[3] : "") +
-								(history[4] != null ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[4] : "")
-						});
-					} else {
-						player.sendMessage(ChatColor.YELLOW + 
-							"No player by the name of " + ChatColor.GREEN + target + ChatColor.YELLOW + " found.");
-					}
+			String target = "";
+			
+			if (split.length == 1) {
+				if (player.hasPermission("bitauth.iphistory.other"))
+					target = split[0];
+				else 
+					player.sendMessage(ChatColor.RED + 
+							"You do not have access /iphistory <username>.");
+			} else if (split.length == 0) {
+				target = player.getName();
+			}
+			
+			if (!target.equals("")) {
+				if (plugin.database.playerExists(target)) {
+					String[] history = plugin.database.getPlayerIPHistory(target);
+					player.sendMessage(new String[] {
+							ChatColor.YELLOW + "The most recent IP addresses for " + ChatColor.GREEN + target + ChatColor.YELLOW + ":",
+							(!history[0].equals("null") ? ChatColor.GREEN + history[0] : "") +
+							(!history[1].equals("null") ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[1] : "") +
+							(!history[2].equals("null") ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[2] : "") +
+							(!history[3].equals("null") ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[3] : "") +
+							(!history[4].equals("null") ? ChatColor.YELLOW + ", " + ChatColor.GREEN + history[4] : "")
+					});
 				} else {
 					player.sendMessage(ChatColor.YELLOW + 
-							"You do not have access to this feature.");
+						"No player by the name of " + ChatColor.GREEN + target + ChatColor.YELLOW + " found.");
 				}
 			}
 			
