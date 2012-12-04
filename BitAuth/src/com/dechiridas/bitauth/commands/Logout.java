@@ -31,12 +31,12 @@ public class Logout implements CommandExecutor {
 						plugin.database.tryLogout(sender, split[0]);
 					else
 						sender.sendMessage(ChatColor.YELLOW + "Player \"" + split[0] + "\" could not be found.");
-
-					r = true;
 				} else {
 					sender.sendMessage(ChatColor.RED + 
 							"You do not have access /logout <username>.");
 				}
+				
+				r = true;
 			}
 		} else {
 			if (split.length == 1) {
