@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 import com.dechiridas.bitauth.BitAuth;
 import com.dechiridas.bitauth.player.BAPlayer;
@@ -19,6 +20,7 @@ public class BAPlayerListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerLogin(PlayerLoginEvent event) {
+		Player player = event.getPlayer();
 		boolean whitelisted = plugin.database.isWhitelisted(event.getPlayer());
 		long regdate = plugin.database.getRegistrationDate(event.getPlayer());
 		long now = (long)(Math.floor(System.currentTimeMillis() / 1000));
@@ -26,8 +28,9 @@ public class BAPlayerListener implements Listener {
 		
 		if ((whitelisted == false || diff < plugin.database.getWhitelistBypassTime()) 
 				&& plugin.database.whitelistEnabled() == true)
-			event.disallow(null, "You are not whitelisted.");
-		
+			event.disallow(Result.KICK_WHITELIST, "You are not whitelisted.");
+		else if (!player.getName().matches("(?i)[a-z0-9_]{1,16}"))
+			event.disallow(Result.KICK_OTHER, "Invalid username! Must only contain a-Z, 0-9 and _ and be 1-16 characters long!");
 		else
 			plugin.database.tryLogin(event.getPlayer(), event);
 	}
@@ -55,7 +58,7 @@ public class BAPlayerListener implements Listener {
 			}
 			
 			// Exits the loop if it takes more than 2 seconds.
-			if (timeout >= timeout + 2000000) {
+			if (System.nanoTime() >= timeout + 2000000000) {
 				player.kickPlayer("Something went wrong with authentication. Please relog.");
 				plugin.log.println(ChatColor.stripColor(player.getDisplayName()) + " was kicked because BitAuth fucked up.");
 				break;
