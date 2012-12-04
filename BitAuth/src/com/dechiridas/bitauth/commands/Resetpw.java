@@ -3,14 +3,13 @@ package com.dechiridas.bitauth.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import com.dechiridas.bitauth.BitAuth;
 
-public class Chpasswd implements CommandExecutor {
+public class Resetpw implements CommandExecutor {
 	private BitAuth plugin;
 	
-	public Chpasswd(BitAuth instance) {
+	public Resetpw(BitAuth instance) {
 		this.plugin = instance;
 	}
 
@@ -18,12 +17,8 @@ public class Chpasswd implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
 		boolean r = false;
 		
-		if (sender instanceof Player) {
-			Player player = (Player)sender;
-			plugin.database.tryChangePassword(player, split);
-			r = true;
-		} else {
-			plugin.log.println("This is an in-game only command.");
+		if (split.length == 2) {
+			plugin.database.tryResetPassword(sender, split);
 			r = true;
 		}
 		

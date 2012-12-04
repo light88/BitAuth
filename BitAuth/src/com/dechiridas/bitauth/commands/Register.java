@@ -20,8 +20,11 @@ public class Register implements CommandExecutor {
 		
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			plugin.database.tryRegister(player, split[0]);
-			r = true;
+			
+			if (split.length == 1) {
+				plugin.database.tryRegister(player, split[0]);
+				r = true;
+			}
 		} else {
 			plugin.log.println("This is an in-game only command.");
 			r = true;

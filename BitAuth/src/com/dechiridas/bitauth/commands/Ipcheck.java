@@ -19,9 +19,13 @@ public class Ipcheck implements CommandExecutor {
 		boolean r = false;
 		
 		if (sender instanceof Player) {
-			Player player = (Player)sender;
-			plugin.database.tryIpcheck(player, split);
-			r = true;
+			if (split.length == 1) {
+				if (split[0].matches("(?i)(enable|disable)")) {
+					Player player = (Player)sender;
+					plugin.database.tryIpcheck(player, split);
+					r = true;
+				}
+			}
 		} else {
 			plugin.log.println("This is an in-game only command.");
 			r = true;

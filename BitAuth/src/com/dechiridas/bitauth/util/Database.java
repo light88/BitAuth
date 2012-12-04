@@ -15,7 +15,6 @@ import java.util.ConcurrentModificationException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerLoginEvent;
 
@@ -662,115 +661,48 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
-
-	public void tryLogout(String[] input) {
-		Player player = null;
-		
-		for (Player p : plugin.getServer().getOnlinePlayers())
-			if (p.getName().equals(input[0]))
-				player = p;
-		
-		tryLogout(player, input);
-	}
 	
-	public void tryLogout(Player player, String[] input) {
-		// Get target players name
-		String name = "";
-		
-		// Now defaults to player issueing the command if no given name is found
-		if (input != null && input.length == 1)
-			name = input[0];
-		else if (input == null || input.length == 0)
-			name = player.getName();
-		
-		boolean playerFound = false;
-		
+	public void tryLogout(CommandSender sender, String name) {
 		// Look for player
 		BAPlayer ba = plugin.pman.getBAPlayerByName(name);
-		if (ba != null)
-			playerFound = true;
 		
-		if (playerFound == true) {
-			// Remove the player from the loggedIn list
-			ba.setState(BAState.LOGGEDOUT);
+		// Remove the player from the loggedIn list
+		ba.setState(BAState.LOGGEDOUT);
+		
+		try {
+			// Create connection
+			Connection conn = DriverManager.getConnection(url, user, pass);
 			
-			try {
-				// Create connection
-				Connection conn = DriverManager.getConnection(url, user, pass);
-				
-				// Query to reset last login time to 1
-				String query = "UPDATE `"
-						+ login
-						+ "` SET lastlogintime='1' WHERE username='"
-						+ name + "'";
-				
-				// Create statement object
-				Statement update = conn.createStatement();
-				
-				// Execute update
-				update.executeUpdate(query);
-				
-				// Message sender
-				player.sendMessage(ChatColor.YELLOW + 
-						"Player " + name + " has been logged out");
-				
-				// Message recipient
-				ba.getPlayer().sendMessage(ChatColor.YELLOW + "You have been logged out");
-				
-				// Clean up
-				update.close();
-				conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
+			// Query to reset last login time to 1
+			String query = "UPDATE `"
+					+ login
+					+ "` SET lastlogintime='1' WHERE username='"
+					+ name + "'";
+			
+			// Create statement object
+			Statement update = conn.createStatement();
+			
+			// Execute update
+			update.executeUpdate(query);
+			
+			// Message sender
+			if (sender instanceof Player)
+				sender.sendMessage(ChatColor.YELLOW + "Player " + name + " has been logged out");
+			else 
+				sender.sendMessage("Player " + name + " has been logged out");
+			
+			// Message recipient
+			ba.getPlayer().sendMessage(ChatColor.YELLOW + "You have been logged out");
+			
+			// Clean up
+			update.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
 		}
+
 	}
 	
-	public void tryLogoutFromConsole(String[] input) {
-		// Get target players name
-		String name = input[0];
-		boolean playerFound = false;
-
-		// Look for player
-		BAPlayer ba = plugin.pman.getBAPlayerByName(name);
-		if (ba != null)
-			playerFound = true;
-
-		if (playerFound == true) {
-			// Remove the player from the loggedIn list
-			ba.setState(BAState.LOGGEDOUT);
-
-			try {
-				// Create connection
-				Connection conn = DriverManager.getConnection(url, user, pass);
-				
-				// Query to reset last login time to 1
-				String query = "UPDATE `" + login
-						+ "` SET lastlogintime='1' WHERE username='"
-						+ name + "'";
-				
-				// Create statement object
-				Statement update = conn.createStatement();
-				
-				// Execute update
-				update.executeUpdate(query);
-
-				// Message sender
-				plugin.log.println("Player " + name + " has been logged out");
-
-				// Message recipient
-				ba.getPlayer().sendMessage(
-						ChatColor.YELLOW + "You have been logged out");
-
-				// Clean up
-				update.close();
-				conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
-		}
-	}
-
 	public void tryUnregister(Player player) {
 		BAPlayer ba = plugin.pman.getBAPlayerByName(player.getName());
 		
@@ -795,443 +727,337 @@ public class Database {
 		}
 	}
 	
-	public void modifyWhitelist(Object sender, String[] input) {
+	public boolean tryVerifyPassword(Player player, String input) {
 		try {
-			if (input.length == 2) {
-				if (input[0].equals("add") || input[0].equals("del")) {
-					// Determine add or remove
-					boolean addremove = false;
-					if (input[0].equals("add"))
-						addremove = true;
-					if (input[0].equals("del"))
-						addremove = false;
-					
-					// Get indicated user name
-					String username = input[1];
-					
-					// Create connection and statement
-					Connection conn = DriverManager.getConnection(url, user, pass);
-					
-					// Check for preexisting entry
-					Statement select = conn.createStatement();
-					ResultSet result = select.executeQuery(
-							"SELECT * FROM `bit_whitelist`");
-					
-					boolean playerFound = false;
-					if (result.next()) { // Results found
-						do {
-							String user = result.getString(1);
-							if (user.equals(username)) { // Player data found
-								playerFound = true;
-							}
-						} while (result.next());
-					}
-					
-					if (playerFound == true) { // Update existing information
-						String query = "UPDATE `" + wlist + "` SET enabled='"
-								+ (addremove == true ? 1 : 0)
-								+ "' WHERE username='" + username + "'";
-						Statement update = conn.createStatement();
-													
-						update.executeUpdate(query);
-						update.close();
-					}
-					if (playerFound == false) { // Insert new data
-						String query = "INSERT INTO `" + wlist + "` " +
-								"(`username`, `enabled`) VALUES (?,?)";
-						PreparedStatement insert = conn.prepareCall(query);
-						
-						insert.setString(1, username);
-						insert.setInt(2, (addremove == true ? 1 : 0));
-						
-						insert.executeUpdate();
-						insert.close();
-					}
-					
-					// Clean up
-					result.close();
-					conn.close();
-					
-					// Report back to player
-					if (sender instanceof Player) {
-						Player player = (Player)sender;
-						player.sendMessage(ChatColor.YELLOW + input[1]
-								+ " has been "
-								+ ((addremove == true) ? "added to" : "removed from")
-								+ " the whitelist");
-					} else {
-						plugin.log.println(input[1]
-								+ " has been "
-								+ ((addremove == true) ? "added to" : "removed from")
-								+ " the whitelist");
-					}
-				}
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery(
+					"SELECT * FROM `" + login + "` WHERE username='" + player.getName() + "'");
+			
+			if (result.next()) { // Results found
+				byte[] salt = result.getBytes(2);
+				byte[] pwdhash = result.getBytes(3);
+				
+				byte[] pwdtest = HashManager.GenerateHash(input, salt);
+				if (Utils.byteToString(pwdtest).equals(Utils.byteToString(pwdhash))) // input password correct
+					return true;
+				else // input password incorrect
+					return false;
 			}
-			if (input.length == 1) {
-				if (input[0].equals("enable")) { // Enable whitelist
-					// Check current whitelist state
-					boolean wl = plugin.config.getBoolean("settings.whitelist.enabled");
-					if (wl == false) {
-						plugin.config.set("settings.whitelist.enabled", true);
-						if (sender instanceof Player)
-							((Player)sender).sendMessage(ChatColor.GREEN + "Whitelist enabled");
-						else
-							plugin.log.println("Whitelist enabled");
+			
+			result.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (UnsupportedEncodingException uee) {
+			uee.printStackTrace();
+		} catch (NoSuchAlgorithmException nsae) {
+			nsae.printStackTrace();
+		}
+		return false;
+	}
+	
+	public boolean modifyWhitelist(String[] input) {
+		try {
+			// Determine add or remove
+			boolean addremove = false;
+			if (input[0].equals("add"))
+				addremove = true;
+			if (input[0].equals("del"))
+				addremove = false;
+			
+			// Get indicated user name
+			String username = input[1];
+			
+			// Create connection and statement
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			
+			// Check for preexisting entry
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery(
+					"SELECT * FROM `" + wlist + "`");
+			
+			boolean playerFound = false;
+			if (result.next()) { // Results found
+				do {
+					String user = result.getString(1);
+					if (user.equals(username)) { // Player data found
+						playerFound = true;
 					}
-					else
-						if (sender instanceof Player)
-							((Player)sender).sendMessage(ChatColor.YELLOW + "Whitelist is already enabled");
-						else
-							plugin.log.println("Whitelist is already enabled");
-				}
-				if (input[0].equals("disable")) { // Disable whitelist
-					// Check current whitelist state
-					boolean wl = plugin.config.getBoolean("settings.whitelist.enabled");
-					if (wl == true) {
-						plugin.config.set("settings.whitelist.enabled", false);
-						
-						if (sender instanceof Player)
-							((Player)sender).sendMessage(ChatColor.GREEN + "Whitelist disabled");
-						else
-							plugin.log.println("Whitelist disabled");
-					}
-					else
-						if (sender instanceof Player)
-							((Player)sender).sendMessage(ChatColor.YELLOW + "Whitelist is already disabled");
-						else
-							plugin.log.println("Whitelist is already disabled");
-				}
+				} while (result.next());
 			}
+			
+			if (playerFound == true) { // Update existing information
+				String query = "UPDATE `" + wlist + "` SET enabled='"
+						+ (addremove == true ? 1 : 0)
+						+ "' WHERE username='" + username + "'";
+				Statement update = conn.createStatement();
+											
+				update.executeUpdate(query);
+				update.close();
+			}
+			if (playerFound == false) { // Insert new data
+				String query = "INSERT INTO `" + wlist + "` " +
+						"(`username`, `enabled`) VALUES (?,?)";
+				PreparedStatement insert = conn.prepareCall(query);
+				
+				insert.setString(1, username);
+				insert.setInt(2, (addremove == true ? 1 : 0));
+				
+				insert.executeUpdate();
+				insert.close();
+			}
+			
+			// Clean up
+			result.close();
+			conn.close();
+			
+			// Report back to player
+			return addremove;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		return false;
+	}
+	
+	public void toggleWhitelist(CommandSender sender, String[] input) {
+		if (input[0].equalsIgnoreCase("enable")) { // Enable whitelist
+			// Check current whitelist state
+			boolean wl = plugin.config.getBoolean("settings.whitelist.enabled");
+			if (wl == false) {
+				plugin.config.set("settings.whitelist.enabled", true);
+				if (sender instanceof Player)
+					((Player)sender).sendMessage(ChatColor.GREEN + "Whitelist enabled");
+				else
+					plugin.log.println("Whitelist enabled");
+			}
+			else
+				if (sender instanceof Player)
+					((Player)sender).sendMessage(ChatColor.YELLOW + "Whitelist is already enabled");
+				else
+					plugin.log.println("Whitelist is already enabled");
+		}
+		if (input[0].equalsIgnoreCase("disable")) { // Disable whitelist
+			// Check current whitelist state
+			boolean wl = plugin.config.getBoolean("settings.whitelist.enabled");
+			if (wl == true) {
+				plugin.config.set("settings.whitelist.enabled", false);
+				
+				if (sender instanceof Player)
+					((Player)sender).sendMessage(ChatColor.GREEN + "Whitelist disabled");
+				else
+					plugin.log.println("Whitelist disabled");
+			}
+			else
+				if (sender instanceof Player)
+					((Player)sender).sendMessage(ChatColor.YELLOW + "Whitelist is already disabled");
+				else
+					plugin.log.println("Whitelist is already disabled");
+		}
+	}
+
+	public void tryIpcheck(Player player, String[] input) {
+		boolean ipcheckFlag = false;
+		int ipcheckFlagInt = 0;
+		
+		// Check the input
+		if (input[0].equals("enable"))
+			ipcheckFlag = true;
+		if (input[0].equals("disable"))
+			ipcheckFlag = false;
+		
+		if (ipcheckFlag == true)
+			ipcheckFlagInt = 1;
+		if (ipcheckFlag == false)
+			ipcheckFlagInt = 0;
+		
+		try {
+			// Create connection
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			
+			String query = "UPDATE `" + login + "` SET enableipcheck='"
+					+ ipcheckFlagInt + "' WHERE username='"
+					+ player.getName() + "'";
+			Statement update = conn.createStatement();
+			update.executeUpdate(query);
+			
+			update.close();
+			
+			player.sendMessage(ChatColor.GREEN
+					+ "IP checking for your account has been "
+					+ ((ipcheckFlag == true) ? "enabled" : "disabled"));
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
 	}
 
-	public void tryIpcheck(Player player, String[] input) {
-		if (input.length == 1) {
-			if (input[0].equals("enable") || input[0].equals("disable")) {
-				boolean ipcheckFlag = false;
-				int ipcheckFlagInt = 0;
+	public void tryChangePassword(Player player, String[] input) {
+		String oldpasswd = input[0];
+		String newpasswd = input[1];
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery(
+					"SELECT * FROM `" + login + "` WHERE username='" + player.getName() + "'");
+			
+			if (result.next()) { // Results found
+				byte[] salt = result.getBytes(2);
+				byte[] pwdhash = result.getBytes(3);
 				
-				// Check the input
-				if (input[0].equals("enable"))
-					ipcheckFlag = true;
-				if (input[0].equals("disable"))
-					ipcheckFlag = false;
-				
-				if (ipcheckFlag == true)
-					ipcheckFlagInt = 1;
-				if (ipcheckFlag == false)
-					ipcheckFlagInt = 0;
-				
-				try {
-					// Create connection
-					Connection conn = DriverManager.getConnection(url, user, pass);
+				byte[] pwdtest = HashManager.GenerateHash(oldpasswd, salt);
+				if (Utils.byteToString(pwdtest).equals(Utils.byteToString(pwdhash))) { // oldpasswd matches current password
+					// Generate new salt for password and new password hash from the input + salt
+					byte[] newsalt = HashManager.GenerateSalt();
+					byte[] newpass = HashManager.GenerateHash(newpasswd, newsalt);
+
+					// Create query and statement
+					String query = "UPDATE `" + login
+							+ "` SET `salt`= ?, `password`= ? " + "WHERE `username`= ?";
+					PreparedStatement update = conn.prepareStatement(query);
 					
-					String query = "UPDATE `" + login + "` SET enableipcheck='"
-							+ ipcheckFlagInt + "' WHERE username='"
-							+ player.getName() + "'";
-					Statement update = conn.createStatement();
-					update.executeUpdate(query);
+					// Set the values in the statement
+					update.setBytes(1, newsalt);
+					update.setBytes(2, newpass);
+					update.setString(3, player.getName());
 					
+					// Execute the statement
+					update.execute();
+					
+					// Clean up
 					update.close();
 					
-					player.sendMessage(ChatColor.GREEN
-							+ "IP checking for your account has been "
-							+ ((ipcheckFlag == true) ? "enabled" : "disabled"));
-				} catch (SQLException se) {
-					se.printStackTrace();
+					player.sendMessage(ChatColor.GREEN + "Password updated successfully");
+				} else { // oldpasswd does not match current password
+					player.sendMessage(ChatColor.YELLOW + "Incorrect password");
 				}
 			}
-			else {
-				player.sendMessage(ChatColor.YELLOW + "Error: Argument " + input[0] + " not recognized");
-			}
-		}
-	}
-
-	public void tryChangePassword(Player player, String[] input) {
-		if (input.length == 2) {
-			String oldpasswd = input[0];
-			String newpasswd = input[1];
 			
-			try {
-				Connection conn = DriverManager.getConnection(url, user, pass);
-				Statement select = conn.createStatement();
-				ResultSet result = select.executeQuery(
-						"SELECT * FROM `" + login + "` WHERE username='" + player.getName() + "'");
-				
-				if (result.next()) { // Results found
-					byte[] salt = result.getBytes(2);
-					byte[] pwdhash = result.getBytes(3);
-					
-					byte[] pwdtest = HashManager.GenerateHash(oldpasswd, salt);
-					if (Utils.byteToString(pwdtest).equals(Utils.byteToString(pwdhash))) { // oldpasswd matches current password
-						// Generate new salt for password and new password hash from the input + salt
-						byte[] newsalt = HashManager.GenerateSalt();
-						byte[] newpass = HashManager.GenerateHash(newpasswd, newsalt);
-
-						// Create query and statement
-						String query = "UPDATE `" + login
-								+ "` SET `salt`= ?, `password`= ? " + "WHERE `username`= ?";
-						PreparedStatement update = conn.prepareStatement(query);
-						
-						// Set the values in the statement
-						update.setBytes(1, newsalt);
-						update.setBytes(2, newpass);
-						update.setString(3, player.getName());
-						
-						// Execute the statement
-						update.execute();
-						
-						// Clean up
-						update.close();
-						
-						player.sendMessage(ChatColor.GREEN + "Password updated successfully");
-					} else { // oldpasswd does not match current password
-						player.sendMessage(ChatColor.YELLOW + "Incorrect password");
-					}
-				}
-				
-				result.close();
-				conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			} catch (UnsupportedEncodingException uee) {
-				uee.printStackTrace();
-			} catch (NoSuchAlgorithmException nsae) {
-				nsae.printStackTrace();
-			}
+			result.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (UnsupportedEncodingException uee) {
+			uee.printStackTrace();
+		} catch (NoSuchAlgorithmException nsae) {
+			nsae.printStackTrace();
 		}
 	}
 
-	public void tryResetPassword(Object sender, String[] input) {
-		if (sender instanceof Player) {
-			Player player = (Player)sender;
-			if ((plugin.pex.has(player, "bitauth.pwreset") || player.isOp()) 
-					&& input.length == 2) { // Proper syntax usage and permission
-				String username = input[0];
-				String passwd = input[1];
+	public void tryResetPassword(CommandSender sender, String[] input) {
+		String username = input[0];
+		String passwd = input[1];
+		
+		try {
+			// Create connection and exect SELECT query
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			
+			String query = "SELECT * FROM `" + login + "` WHERE `username`='" + username + "'";
+			Statement statement = conn.createStatement();
+			ResultSet result = statement.executeQuery(query);
+			
+			if (result.next()) { // Data found
+				// Generate new password
+				byte[] salt = HashManager.GenerateSalt();
+				byte[] pass = HashManager.GenerateHash(passwd, salt);
 				
-				try {
-					// Create connection and exect SELECT query
-					Connection conn = DriverManager.getConnection(url, user, pass);
-					
-					String query = "SELECT * FROM `" + login + "` WHERE `username`='" + username + "'";
-					Statement statement = conn.createStatement();
-					ResultSet result = statement.executeQuery(query);
-					
-					if (result.next()) { // Data found
-						// Generate new password
-						byte[] salt = HashManager.GenerateSalt();
-						byte[] pass = HashManager.GenerateHash(passwd, salt);
-						
-						// Create update query
-						String queryUpdate = "UPDATE `"
-								+ login
-								+ "` SET `pwreset`= ?, `temppwd`= ?, `tmpsalt`= ? WHERE `username`= ?";
-						
-						PreparedStatement update = conn.prepareStatement(queryUpdate);
-						
-						// Set values
-						update.setInt(1, 1);
-						update.setBytes(2, pass);
-						update.setBytes(3, salt);
-						update.setString(4, username);
-						
-						// Execute the query
-						update.execute();
-						
-						// Clean up
-						update.close();
-						
-						// Send feedback to player
-						player.sendMessage(ChatColor.YELLOW
-								+ "Password for "
-								+ username
-								+ " has been reset; Inform them of their new temp password");
-					}
-					
-					result.close();
-					statement.close();
-					conn.close();
-				} catch (SQLException se) {
-					se.printStackTrace();
-				} catch (NoSuchAlgorithmException nsae) {
-					nsae.printStackTrace();
-				} catch (UnsupportedEncodingException uee) {
-					uee.printStackTrace();
+				// Create update query
+				String queryUpdate = "UPDATE `"
+						+ login
+						+ "` SET `pwreset`= ?, `temppwd`= ?, `tmpsalt`= ? WHERE `username`= ?";
+				
+				PreparedStatement update = conn.prepareStatement(queryUpdate);
+				
+				// Set values
+				update.setInt(1, 1);
+				update.setBytes(2, pass);
+				update.setBytes(3, salt);
+				update.setString(4, username);
+				
+				// Execute the query
+				update.execute();
+				
+				// Clean up
+				update.close();
+				
+				// Send feedback to player
+				if (sender instanceof Player) {
+					sender.sendMessage(ChatColor.YELLOW
+							+ "Password for "
+							+ username
+							+ " has been reset; Inform them of their new temp password");
+				} else {
+					plugin.log.println("Password for "
+							+ username
+							+ " has been reset; Inform them of their new temp password");
 				}
 			}
-			else if (!player.hasPermission("bitauth.pwreset")) {
-				player.sendMessage(ChatColor.YELLOW + "You do not have access to this feature");
-			}
-		}
-		if (sender instanceof ConsoleCommandSender) {
-			if (input.length == 2) {
-				String username = input[0];
-				String passwd = input[1];
-				
-				try {
-					// Create connection and exect SELECT query
-					Connection conn = DriverManager.getConnection(url, user, pass);
-					
-					String query = "SELECT * FROM `" + login + "` WHERE `username`='" + username + "'";
-					Statement statement = conn.createStatement();
-					ResultSet result = statement.executeQuery(query);
-					
-					if (result.next()) { // Data found
-						// Generate new password
-						byte[] salt = HashManager.GenerateSalt();
-						byte[] pass = HashManager.GenerateHash(passwd, salt);
-						
-						// Create update query
-						String queryUpdate = "UPDATE `"
-								+ login
-								+ "` SET `pwreset`= ?, `temppwd`= ?, `tmpsalt`= ?, `lastlogintime`= ? WHERE `username`= ?";
-						
-						PreparedStatement update = conn.prepareStatement(queryUpdate);
-						
-						// Set values
-						update.setInt(1, 1);
-						update.setBytes(2, pass);
-						update.setBytes(3, salt);
-						update.setLong(4, 0);
-						update.setString(5, username);
-						
-						// Execute the query
-						update.execute();
-						
-						// Clean up
-						update.close();
-						
-						// Send feedback to player
-						plugin.log.println("Password for "
-								+ username
-								+ " has been reset; Inform them of their new temp password");
-					}
-					
-					result.close();
-					statement.close();
-					conn.close();
-				} catch (SQLException se) {
-					se.printStackTrace();
-				} catch (NoSuchAlgorithmException nsae) {
-					nsae.printStackTrace();
-				} catch (UnsupportedEncodingException uee) {
-					uee.printStackTrace();
-				}
-			}
+			
+			result.close();
+			statement.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (NoSuchAlgorithmException nsae) {
+			nsae.printStackTrace();
+		} catch (UnsupportedEncodingException uee) {
+			uee.printStackTrace();
 		}
 	}
 
 	public void tryJumblePassword(CommandSender sender, String[] split) {
-		if (split.length == 1) {
-			if (sender instanceof Player) {
-				Player player = (Player)sender;
-				if (plugin.pex.has(player, "bitauth.jumble") || player.isOp()) {
-					String username = split[0];
-					
-					try {
-						Connection conn = DriverManager.getConnection(url, user, pass);
-						Statement select = conn.createStatement();
-						ResultSet result = select.executeQuery(
-								"SELECT * FROM `" + login + "` WHERE `username`='" + username + "'");
-						
-						boolean playerFound = false;
-						if (result.next()) { // Results found
-							do {
-								String name = result.getString(1);
-								if (name.equals(username)) { // Player data found
-									playerFound = true;
-								}
-							} while (result.next());
-						}
-						
-						if (playerFound == true) {
-							byte[] rpasswd = HashManager.GenerateHash(
-									HashManager.RandomString(), HashManager.GenerateSalt());
-							Statement update = conn.createStatement();
-							String query = "UPDATE `" + login
-									+ "` SET `password`='" + rpasswd
-									+ "' WHERE `username`='" + username + "'";
-							update.executeUpdate(query);
-							update.close();
-							
-							player.sendMessage(ChatColor.YELLOW +
-									"Password for " + username + " has been replaced");
-						}
-						else
-							player.sendMessage(ChatColor.YELLOW + 
-									"Player " + username + " not found");
-						result.close();
-						select.close();
-						conn.close();
-					} catch (SQLException se) {
-						se.printStackTrace();
-					} catch (NoSuchAlgorithmException nsae) {
-						nsae.printStackTrace();
-					} catch (UnsupportedEncodingException uee) {
-						uee.printStackTrace();
+		String username = split[0];
+		
+		try {
+			Connection conn = DriverManager.getConnection(url, user, pass);
+			Statement select = conn.createStatement();
+			ResultSet result = select.executeQuery(
+					"SELECT * FROM `" + login + "` WHERE `username`='" + username + "'");
+			
+			boolean playerFound = false;
+			if (result.next()) { // Results found
+				do {
+					String name = result.getString(1);
+					if (name.equals(username)) { // Player data found
+						playerFound = true;
 					}
-				}
-				else {
-					player.sendMessage(ChatColor.YELLOW +
-							"You do not have access to this feature.");
-				}
+				} while (result.next());
 			}
-
-			if (sender instanceof ConsoleCommandSender) {
-				String username = split[0];
+			
+			if (playerFound == true) {
+				byte[] rpasswd = HashManager.GenerateHash(
+						HashManager.RandomString(), HashManager.GenerateSalt());
+				Statement update = conn.createStatement();
+				String query = "UPDATE `" + login
+						+ "` SET `password`='" + rpasswd
+						+ "' WHERE `username`='" + username + "'";
+				update.executeUpdate(query);
+				update.close();
 				
-				try {
-					Connection conn = DriverManager.getConnection(url, user, pass);
-					Statement select = conn.createStatement();
-					ResultSet result = select.executeQuery(
-							"SELECT * FROM `" + login + "` WHERE `username`='" + username + "'");
-					
-					boolean playerFound = false;
-					if (result.next()) { // Results found
-						do {
-							String name = result.getString(1);
-							if (name.equals(username)) { // Player data found
-								playerFound = true;
-							}
-						} while (result.next());
-					}
-					
-					if (playerFound == true) {
-						byte[] rpasswd = HashManager.GenerateHash(
-								HashManager.RandomString(), HashManager.GenerateSalt());
-						Statement update = conn.createStatement();
-						String query = "UPDATE `" + login
-								+ "` SET `password`='" + rpasswd
-								+ "' WHERE `username`='" + username + "'";
-						update.executeUpdate(query);
-						update.close();
-						
-						plugin.log.println(
-								"Password for " + username + " has been replaced");
-						for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-							if (p.getName().equals(username)) {
-								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "logout " + username);
-								p.kickPlayer("Goodbye.");
-								plugin.log.println("Player " + username + " has been kicked from the server");
-							}
-						}
-					}
-					else
-						plugin.log.println("Player " + username + " not found");
-					result.close();
-					select.close();
-					conn.close();
-				} catch (SQLException se) {
-					se.printStackTrace();
-				} catch (NoSuchAlgorithmException nsae) {
-					nsae.printStackTrace();
-				} catch (UnsupportedEncodingException uee) {
-					uee.printStackTrace();
+				if (sender instanceof Player) {
+					sender.sendMessage(ChatColor.YELLOW +
+							"Password for " + username + " has been replaced");
+				} else {
+					plugin.log.println(
+							"Password for " + username + " has been replaced");
 				}
 			}
+			else if (sender instanceof Player) {
+				sender.sendMessage(ChatColor.YELLOW + 
+						"Player " + username + " not found");
+			} else {
+				plugin.log.println(
+						"Player " + username + " not found");
+			}
+			result.close();
+			select.close();
+			conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (NoSuchAlgorithmException nsae) {
+			nsae.printStackTrace();
+		} catch (UnsupportedEncodingException uee) {
+			uee.printStackTrace();
 		}
 	}
 

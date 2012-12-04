@@ -17,7 +17,10 @@ public class Jumblepw implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
 		boolean r = false;
 		
-		plugin.database.tryJumblePassword(sender, split);
+		if (split.length == 1) {
+			plugin.database.tryJumblePassword(sender, split);
+			r = true;
+		}
 		
 		return r;
 	}

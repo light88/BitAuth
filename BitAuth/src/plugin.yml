@@ -3,71 +3,112 @@ version: 1.2.3
 description: A lightweight authentication plugin. Uses MySQL.
 author: dechiridas
 website: http://dechiridas.github.com/BitAuth
-depend: [PermissionsEx]
 main: com.dechiridas.bitauth.BitAuth
 commands:
-    register:
-        description: Registers to the server
-        usage: /register <password>
-    login:
-        description: Log in to the server
-        usage: /login <password>
-    pwreset:
-        description: Administrative command, resets a players password and forces a new one to be entered on next login
-        usage: /pwreset <username> <temp password>
-    ipcheck:
-        description: Enable or disable IP checking on your account
-        usage: /ipcheck <enable/disable>
-    whitelist:
-        description: Administrative command, adds or removes a specified player from the whitelist
-        usage: /whitelist <add/del> <username>
-    logout:
-        description: Terminate your current session, requires the user to log back in to play
-        usage: /logout [username]
-    unregister:
-        description: Can be used to unregister your account or by an administrator to remove the account of another user
-        usage: /unregister [username]
-    chpasswd:
-        description: Used to change your password
-        usage: /chpasswd <oldpass> <newpass>
-    jumblepw:
-        description: Used to permanently disable a user without banning them
-        usage: /jumblepw <username>
-    baversion:
-        description: Retrieve the version number of BitAuth
-        usage: /baversion
-    iphistory:
-        description: Retrieve the last 5 unique IP addresses associated with a user
-        usage: /iphistory <user>
-        aliases: [history, ips]
+  register:
+    description: Registers to the server
+    permission: bitauth.register
+    permission-message: You to not have access to /register.
+    usage: /register <password>
+  login:
+    description: Log in to the server
+    permission: bitauth.login
+    permission-message: You do not have access to /login.
+    usage: /login <password>
+  resetpw:
+    description: Administrative command, resets a players password and forces a new one to be entered on next login
+    aliases: resetpassword
+    permission: bitauth.resetpw
+    permission-message: You do not have access to /resetpw.
+    usage: /resetpw <username> <temp password>
+  ipcheck:
+    description: Enable or disable IP checking on your account
+    permission: bitauth.ipcheck
+    permission-message: You do not have access to /ipcheck.
+    usage: /ipcheck <enable/disable>
+  whitelist:
+    description: Administrative command, adds or removes a specified player from the whitelist
+    permission: bitauth.whitelist
+    permission-message: You do not have access to /whitelist.
+    usage: /whitelist <add/del> <username> or /whitelist <enable/disable>
+  logout:
+    description: Terminate your current session, requires the user to log back in to play
+    permission: bitauth.logout
+    permission-message: You do not have access to /logout.
+    usage: /logout [username]
+  unregister:
+    description: Can be used to unregister your account or by an administrator to remove the account of another user
+    permission: bitauth.unregister
+    permission-message: You do not have access to /unregister.
+    usage: /unregister <password> or /unregister [username]
+  changepw:
+    description: Used to change your password
+    aliases: changepassword
+    permission: bitauth.changepw
+    permission-message: You do not have access to /changepw.
+    usage: /changepw <oldpass> <newpass>
+  jumblepw:
+    description: Used to permanently disable a user without banning them
+    aliases: jumblepassword
+    permission: bitauth.jumble
+    permission-message: You do not have access to /jumblepw.
+    usage: /jumblepw <username>
+  iphistory:
+    description: Retrieve the last 5 unique IP addresses associated with a user
+    aliases: [history, ips]
+    permission: bitauth.iphistory
+    permission-message: You do not have access to /iphistory.
+    usage: /iphistory <user>
 permissions:
-    bitauth.*:
-        description: Gives access to all BitAuth features
-        children:
-            bitauth.whitelist: true
-            bitauth.pwreset: true
-            bitauth.logout: true
-            bitauth.logout.other: true
-            bitauth.iphistory.self: true
-            bitauth.iphistory.other: true
-    bitauth.whitelist:
-        description: Allows you to modify the whitelist
-        default: op
-    bitauth.pwreset:
-        description: Allows you to reset user passwords
-        default: op
-    bitauth.logout:
-        description: Allows you to terminate your current session
-        default: op
-    bitauth.logout.other:
-        description: Allows you to forcefully log another user out
-        default: op
-    bitauth.jumble:
-        description: Allows you to jumble user passwords (disable the user more or less)
-        default: op
-    bitauth.iphistory.self:
-        description: Allows you to check your own IP history
-        default: op
-    bitauth.iphistory.other:
-        description: Allows you to check the IP history of another user
-        default: op
+  bitauth.*:
+    description: Gives access to all BitAuth features
+    children:
+      bitauth.whitelist: true
+      bitauth.whitelist.toggle: true
+      bitauth.resetpw: true
+      bitauth.jumble: true
+      bitauth.logout.other: true
+      bitauth.iphistory.other: true
+      bitauth.unregister.other: true
+  bitauth.register:
+    description: Allows you to register
+    default: true
+  bitauth.login:
+    description: Allows you to login
+    default: true
+  bitauth.resetpw:
+    description: Allows you to reset user passwords
+    default: op
+  bitauth.ipcheck:
+    description: Allows you to enable or disable IP checking on your account
+    default: true
+  bitauth.whitelist:
+    description: Allows you to modify the whitelist
+    default: op
+  bitauth.whitelist.toggle:
+    description: Allows you to toggle the whitelist on or off
+    default: op
+  bitauth.logout:
+    description: Allows you to terminate your current session
+    default: true
+  bitauth.logout.other:
+    description: Allows you to forcefully log another user out
+    default: op
+  bitauth.unregister:
+    description: Allows you to to unregister your own account
+    default: true
+  bitauth.unregister.other:
+    description: Allows you to unregister someone else's account
+    default: op
+  bitauth.changepw:
+    description: Allows you to change your password
+    default: true
+  bitauth.jumble:
+    description: Allows you to jumble user passwords (disable the user more or less)
+    default: op
+  bitauth.iphistory:
+    description: Allows you to check your own IP history
+    default: true
+  bitauth.iphistory.other:
+    description: Allows you to check the IP history of another user
+    default: op

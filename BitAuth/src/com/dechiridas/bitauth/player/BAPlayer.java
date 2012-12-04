@@ -39,14 +39,14 @@ public class BAPlayer {
 		}
 		
 		public void run() {
-			try {
-				sleep(timeout * 1000);
-				
-				if (state == BAState.LOGGEDOUT || state == BAState.UNREGISTERED)
-					player.kickPlayer("Failed to log in within " + timeout + " seconds.");
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+			    @Override
+			    public void run() {
+			    	if (state == BAState.LOGGEDOUT || state == BAState.UNREGISTERED) {
+			    		player.kickPlayer("Failed to log in within " + timeout + " seconds.");
+			    	}
+			    }
+			}, (long) timeout*20);
 		}
 	}
 }

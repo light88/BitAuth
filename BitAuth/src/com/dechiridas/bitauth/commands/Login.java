@@ -20,8 +20,12 @@ public class Login implements CommandExecutor {
 		
 		if (sender instanceof Player) {
 			Player player = (Player)sender;
-			plugin.database.tryLoginManual(player, split);
-			r = true;
+
+			if (split.length == 1 || split.length == 2) {
+				plugin.database.tryLoginManual(player, split);
+				r = true;
+			}
+
 		} else {
 			plugin.log.println("This is an in-game only command.");
 			r = true;
