@@ -1,0 +1,30 @@
+# Settings for BitAuth
+settings:
+    # Login timeout in seconds
+    timeout: 120
+    # Whitelist configuration
+    whitelist:
+        # Enable or disable the whitelist
+        enabled: false
+        # Time in seconds for whitelist bypass to enable for a user
+        # For reference, one day is 86,400 seconds
+        bypass: 259200
+
+    # Database configuration
+    database:
+        # Database username
+        username: user
+        # Password for the above database used
+        password: password
+        # Database name
+        database: database
+        # Host name (eg: example.com) or IP address (eg: 192.168.1.100)
+        host: 127.0.0.1
+        # Tables used by this plugin in the above database
+        tables:
+            # Table used to store player login information
+            login: login_tbl
+            # Table used for whitelist entries
+            whitelist: wl_tbl
+            # Table the keeps a track of past IP addresses for players (limit: 5)
+            iphistory: ip_tbl
